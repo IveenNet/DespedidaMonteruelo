@@ -8,9 +8,11 @@
 
 ## 📋 Descripción
 
-Sistema automatizado y continuo para analizar y detectar vulnerabilidades en aplicaciones web desplegadas por una organización, alertando al SOC ante nuevas vulnerabilidades encontradas.
+Se ha implementado un sistema automatizado y continuo para analizar y detectar vulnerabilidades en aplicaciones web desplegadas por una organización, alertando al SOC ante nuevas vulnerabilidades encontradas.
 
 El flujo de automatización utiliza **Clawbot** (en lugar de n8n) para orquestar los escaneos periódicos mediante la API de **OWASP ZAP**, integrando los resultados con **Wazuh (SIEM)** y notificando al equipo vía **Telegram**.
+
+El bot ha sido correctamente configurado, delimitando los permisos y accesos para bloquear posibles vectores de ataque.
 
 ---
 
