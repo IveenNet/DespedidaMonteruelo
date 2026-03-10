@@ -11,7 +11,7 @@
 
 Se ha implementado un sistema automatizado y continuo **(SOAR/ChatOps)** para analizar y detectar vulnerabilidades en aplicaciones web. El núcleo del proyecto es **Clawdbot**, un agente basado en IA que actúa como cerebro y orquestador central de la seguridad.
 
-El flujo de trabajo es el siguiente: **Wazuh** actúa como sensor monitorizando los eventos de las aplicaciones web (por ejemplo, subida de ficheros sospechosos). Cuando **Wazuh** detecta una anomalía, envía la alerta en bruto a **Clawdbot**. El bot, de forma autónoma, analiza la situación, consulta la API de **VirusTotal** para verificar hashes o dominios, y se comunica con la API de **OWASP ZAP** para comprobar vulnerabilidades o lanzar escaneos activos bajo demanda. Finalmente, el bot notifica al equipo vía **Telegram** con contexto detallado y opciones de respuesta interactiva.
+El flujo de trabajo es el siguiente: **Wazuh** actúa como sensor monitorizando los eventos de las aplicaciones web (por ejemplo, subida de ficheros sospechosos). Cuando **Wazuh** detecta una anomalía, envía la alerta en bruto a **Clawdbot**. El bot, de forma autónoma, analiza la situación, consulta la API de **VirusTotal** para verificar hashes o dominios, y se comunica con la API de **OWASP ZAP** para comprobar vulnerabilidades o lanzar escaneos activos bajo demanda. Finalmente, el bot notifica al equipo vía **Telegram** con contexto detallado y opciones de respuesta interactiva. 
 
 ---
 
