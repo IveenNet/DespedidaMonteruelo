@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DespedidaMonteruelo · CIFP Virgen de Gracia</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="logo-tag">CIFP Virgen de Gracia</span>
+      <span class="separator">·</span>
+      <span class="project-name">DespedidaMonteruelo</span>
+    </div>
+    <div class="topbar-right">
+      <span class="nav-hint"><kbd>←</kbd><kbd>→</kbd> navegar</span>
+      <span class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides">-</span></span>
+    </div>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+
+  <div class="main">
+    <!-- Sidebar — se construye dinámicamente desde app.js -->
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-label">Reto 4</div>
+        <div class="sidebar-title">Análisis de vulnerabilidades automatizado</div>
+      </div>
+      <div class="nav-list" id="navList"></div>
+    </nav>
+
+    <!-- Content — slides se inyectan dinámicamente desde app.js -->
+    <div class="content" id="content"></div>
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <button class="btn-nav" id="btnPrev" onclick="navigate(-1)">←</button>
+    <button class="btn-nav" id="btnNext" onclick="navigate(1)">→</button>
+  </div>
+
+  <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
