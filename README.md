@@ -3,49 +3,52 @@
 > **PROYECTO DE INNOVACIÓN EDUCATIVA**  
 > Automatización en ciberseguridad con software libre  
 > CIFP Virgen de Gracia
+> Integrantes: Ivan, Luis y Sergio
 
 ---
 
 ## 📋 Descripción
 
-Se ha implementado un sistema automatizado y continuo para analizar y detectar vulnerabilidades en aplicaciones web desplegadas por una organización, alertando al SOC ante nuevas vulnerabilidades encontradas.
+Se ha implementado un sistema automatizado y continuo **(SOAR/ChatOps)** para analizar y detectar vulnerabilidades en aplicaciones web. El núcleo del proyecto es **Clawdbot**, un agente basado en IA que actúa como cerebro y orquestador central de la seguridad.
 
-El flujo de automatización utiliza **Clawbot** (en lugar de n8n) para orquestar los escaneos periódicos mediante la API de **OWASP ZAP**, integrando los resultados con **Wazuh (SIEM)** y notificando al equipo vía **Telegram**.
-
-El bot ha sido correctamente configurado, delimitando los permisos y accesos para bloquear posibles vectores de ataque.
+El flujo de trabajo es el siguiente: **Wazuh** actúa como sensor monitorizando los eventos de las aplicaciones web (por ejemplo, subida de ficheros sospechosos). Cuando **Wazuh** detecta una anomalía, envía la alerta en bruto a **Clawdbot**. El bot, de forma autónoma, analiza la situación, consulta la API de **VirusTotal** para verificar hashes o dominios, y se comunica con la API de **OWASP ZAP** para comprobar vulnerabilidades o lanzar escaneos activos bajo demanda. Finalmente, el bot notifica al equipo vía **Telegram** con contexto detallado y opciones de respuesta interactiva.
 
 ---
 
 ## 🏗️ Arquitectura del Sistema
 
 ```
-+----------------+
-| Aplicacion     |      (DVWA, Juice Shop, WebGoat...)
-| Web Vuln.      |
-+-------+--------+
-        |
-        | Escaneo periódico
-        v
-+----------------+       +----------------+      +----------------+
-|   Clawbot      |------>|   OWASP ZAP    |      |  VirusTotal    |
-|   (cron)       |<------|     (API)      |      |    (API Key)   |
-+-------+--------+       +----------------+      +-------+--------+
-        |                                                 |
-        |<────────── Análisis de URLs / hashes ───────────┘
-        |
-        | Si hay vulnerabilidades
-        v
-+----------------+         +----------------+
-|   Wazuh        |-------->|   Dashboard    |
-|   (SIEM)       |         |     SOC        |
-+-------+--------+         +----------------+
-        |
-        | Notificación
-        v
-+----------------+
-|   Telegram     |
-|   (alertas)    |
-+----------------+
++-------------------+
+| Aplicaciones Web  | (DVWA, Juice Shop, WebGoat...)
+|   Vulnerables     |
++--------+----------+
+         |
+         | 1. Logs, archivos subidos, monitorización
+         v
++-------------------+        +-------------------+
+|   Wazuh (SIEM)    |------->|  Wazuh Dashboard  | (Interfaz SOC)
+| (Ojos y Oídos)    |        +-------------------+
++--------+----------+
+         |
+         | 2. Alerta en bruto (Ej: Nuevo archivo sospechoso subido)
+         v
++-------------------+ 3. Consulta  +-------------------+
+|                   |------------->|    VirusTotal     |
+|                   |<-------------|     (API Key)     |
+|                   |              +-------------------+
+|     Clawdbot      |
+|  (Cerebro IA /    | 4. Escaneo   +-------------------+
+|   Orquestador)    |------------->|    OWASP ZAP      |
+|                   |<-------------|   (API / Escáner) |
++--------+----------+              +-------------------+
+         |
+         | 5. Alerta enriquecida + Opciones de acción
+         v
++-------------------+
+|     Telegram      | (Ej: "¡Archivo malicioso! ¿Lanzo escaneo activo en ZAP o quieres ver información sobre lo que ocurre?")
+|  (ChatOps / SOC)  |
++-------------------+
+
 ```
 
 ---
@@ -54,13 +57,13 @@ El bot ha sido correctamente configurado, delimitando los permisos y accesos par
 
 | Herramienta | Rol |
 |-------------|-----|
-| **Clawbot** | Orquestador del flujo de automatización |
-| **OWASP ZAP** | Escáner de vulnerabilidades web (API) |
-| **VirusTotal** | Análisis de URLs, dominios y hashes mediante API Key |
-| **Wazuh** | SIEM — correlación y gestión de alertas |
-| **Telegram Bot** | Notificaciones en tiempo real al equipo |
-| **Docker / Podman** | Contenedores para despliegue del laboratorio |
-| **DVWA / Juice Shop / WebGoat** | Aplicaciones web vulnerables de prueba |
+| **Clawdbot** | Orquestador del flujo de automatización: Recibe alertas, toma decisiones, interactúa con APIs externas y se comunica con el equipo. |
+| **OWASP ZAP** | Escáner de vulnerabilidades web (API) Realiza escaneos pasivos en segundo plano y escaneos activos a petición de Clawdbot. |
+| **VirusTotal** | Inteligencia de Amenazas. API consultada por Clawdbot para verificar la reputación de IPs, URLs y hashes de archivos detectados. |
+| **Wazuh** | SIEM — Recolecta logs, monitoriza la integridad de archivos e indexa los datos. Incluye su propio Dashboard.|
+| **Telegram Bot** | Interfaz de usuario. Canal bidireccional donde Clawdbot envía alertas contextualizadas y el equipo lanza comandos. |
+| **Docker-compose** | Infraestructura. Contenedorización de todo el laboratorio para un despliegue rápido y replicable con docker-compose |
+| **DVWA / Juice Shop / WebGoat** | Aplicaciones web vulnerables por diseño para generar la telemetría y alertas. |
 
 ---
 
