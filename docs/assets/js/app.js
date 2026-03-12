@@ -42,7 +42,10 @@ function buildUI() {
       </div>
       <div class="nav-dots">${slide.dots.map(f => `<div class="dot${f ? ' filled' : ''}"></div>`).join('')}</div>
     `;
-    item.addEventListener('click', () => goTo(i));
+    item.addEventListener('click', () => {
+      goTo(i);
+      closeSidebarMobile();
+    });
 
     // append inside last section div
     navListEl.lastElementChild.appendChild(item);
@@ -80,10 +83,34 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(current - 1);
 });
 
-// ─── Custom cursor ─────────────────────────────────────────────────────────
+// ─── Sidebar mobile toggle ──────────────────────────────────────────────────
+const sidebarEl = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+function closeSidebarMobile() {
+  document.body.classList.remove('sidebar-open');
+  sidebarOverlay?.setAttribute('aria-hidden', 'true');
+  sidebarToggle?.setAttribute('aria-label', 'Abrir menú');
+}
+
+sidebarToggle?.addEventListener('click', () => {
+  const isOpen = document.body.classList.toggle('sidebar-open');
+  if (sidebarOverlay) sidebarOverlay.setAttribute('aria-hidden', !isOpen);
+  if (sidebarToggle) sidebarToggle.setAttribute('aria-label', isOpen ? 'Cerrar menú' : 'Abrir menú');
+});
+sidebarOverlay?.addEventListener('click', closeSidebarMobile);
+
+// ─── Custom cursor (solo en dispositivos con ratón) ─────────────────────────
 const cursor = document.getElementById('cursor');
 const ring   = document.getElementById('cursorRing');
 let mx = 0, my = 0, rx = 0, ry = 0;
+const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+if (isTouch) {
+  cursor?.style.setProperty('display', 'none');
+  ring?.style.setProperty('display', 'none');
+  document.body.style.cursor = 'auto';
+}
 
 document.addEventListener('mousemove', e => {
   mx = e.clientX; my = e.clientY;
