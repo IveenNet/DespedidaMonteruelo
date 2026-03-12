@@ -14,6 +14,9 @@
   <!-- Top bar -->
   <div class="topbar">
     <div class="topbar-left">
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú" type="button">
+        <span class="hamburger"></span>
+      </button>
       <span class="logo-tag">CIFP Virgen de Gracia</span>
       <span class="separator">·</span>
       <span class="project-name">DespedidaMonteruelo</span>
@@ -28,9 +31,10 @@
     <div class="progress-fill" id="progressFill" style="width:0%"></div>
   </div>
 
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
   <div class="main">
     <!-- Sidebar — se construye dinámicamente desde app.js -->
-    <nav class="sidebar">
+    <nav class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-label">Reto 4</div>
         <div class="sidebar-title">Análisis de vulnerabilidades automatizado</div>
