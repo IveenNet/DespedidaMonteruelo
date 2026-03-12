@@ -1,5 +1,7 @@
+import redDiagram from '../assets/images/red_drawio.svg';
+
 export default {
-  sectionLabel: null, // misma sección que el anterior
+  sectionLabel: null,
   icon:  '🌐',
   title: 'Red · Opnsense',
   sub:   'firewall · VLANs',
@@ -29,6 +31,10 @@ export default {
         <div class="card-desc">Validar que Clawbot + ZAP puede alcanzar Juice Shop y DVWA a través del firewall.</div>
         <div class="card-tag">pendiente</div>
       </div>
+    </div>
+
+    <div class="network-diagram">
+      <img src="${redDiagram}" alt="Diagrama de red" />
     </div>
 
     <div class="info-box">

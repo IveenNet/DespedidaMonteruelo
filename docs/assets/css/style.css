@@ -467,3 +467,14 @@ h3 { font-size: 14px; font-weight: 600; color: var(--accent2); margin: 24px 0 12
   .slide { padding: 16px 12px 72px; }
   .slide-eyebrow { font-size: 9px; }
 }
+
+.network-diagram {
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.network-diagram img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
