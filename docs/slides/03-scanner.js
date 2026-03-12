@@ -14,7 +14,7 @@ export default {
       <div class="card">
         <div class="card-icon">🕶️</div>
         <div class="card-title">Identity: Pirineus</div>
-        <div class="card-desc">Agente autónomo con rol de analista SOC en la Matrix. Gestiona ChatOps vía Telegram.</div>
+        <div class="card-desc">Agente autónomo con rol de analista SOC en la Matrix. Gestiona ChatOps vía Telegram con respuestas en español.</div>
         <div class="card-tag">AI Engine</div>
       </div>
       <div class="card">
@@ -25,13 +25,16 @@ export default {
       </div>
     </div>
 
-    <h3>// zap_scan.sh (Orquestación Bash)</h3>
+    <h3>// zap_scan.sh (Orquestación Bash + Lockfile)</h3>
     <div class="code-block">
       <div class="code-header">
         <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
         <span class="code-label">zap_scan.sh</span>
       </div>
-      <div class="code-body"><span class="c-muted"># Lanzar Spider y Active Scan vía API</span>
+      <div class="code-body"><span class="c-muted"># Evitar solapamiento de ejecuciones concurrentes</span>
+<span class="c-yellow">if</span> [ -f <span class="c-green">"/tmp/zap_scan.lock"</span> ]; <span class="c-yellow">then</span> <span class="c-yellow">exit</span> 0; <span class="c-yellow">fi</span>
+<span class="c-yellow">trap</span> <span class="c-green">"rm -f /tmp/zap_scan.lock"</span> EXIT
+<span class="c-muted"># Lanzar Spider y Active Scan vía API</span>
 <span class="c-cyan">SPIDER_ID</span>=$(<span class="c-yellow">curl</span> -s <span class="c-green">"$ZAP_URL/JSON/spider/action/scan/"</span> | <span class="c-yellow">jq</span> -r <span class="c-green">'.scan'</span>)
 <span class="c-muted"># Bucle de espera hasta 100%</span>
 <span class="c-yellow">while</span> [ <span class="c-green">"$STATUS"</span> != <span class="c-green">"100"</span> ]; <span class="c-yellow">do</span> <span class="c-yellow">sleep</span> 10; <span class="c-yellow">done</span>
@@ -45,14 +48,14 @@ export default {
         <div class="step-num">01</div>
         <div class="step-content">
           <div class="step-title">Configurar Identidad (AGENTS.md)</div>
-          <div class="step-desc">Editar el "System Prompt" en inglés para definir el rol de Pirineus, sus reglas de seguridad y comandos rápidos (ChatOps).</div>
+          <div class="step-desc">System Prompt en inglés definiendo el rol de Pirineus, reglas de seguridad y comandos ChatOps. Respuestas siempre en español.</div>
         </div>
       </div>
       <div class="step">
         <div class="step-num">02</div>
         <div class="step-content">
           <div class="step-title">Scripts de Integración</div>
-          <div class="step-desc">Crear <code>zap_scan.sh</code> y <code>vt_check.sh</code> en <code>~/vm-scanner</code> para permitir que la IA ejecute herramientas de shell.</div>
+          <div class="step-desc">Crear <code>zap_scan.sh</code> y <code>vt_check.sh</code> en <code>~/vm-scanner</code>. Aprobar ejecución con <code>openclaw approvals allowlist add</code>.</div>
         </div>
       </div>
       <div class="step">
@@ -66,7 +69,7 @@ export default {
         <div class="step-num">04</div>
         <div class="step-content">
           <div class="step-title">Programar Auditoría (Cron)</div>
-          <div class="step-desc"><code>openclaw cron add --every 1h</code> enviando el reporte final a Telegram vía canal <code>442971272</code>.</div>
+          <div class="step-desc"><code>openclaw cron add --every 4h --timeout-seconds 14400</code> enviando el reporte a Telegram vía canal <code>442971272</code>.</div>
         </div>
       </div>
     </div>
