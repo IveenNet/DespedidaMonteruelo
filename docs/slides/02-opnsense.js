@@ -32,7 +32,7 @@ export default {
     </div>
 
     <div class="network-diagram">
-      <img src="./assets/images/red_drawio.svg" alt="Diagrama de red" />
+      <img src="./assets/images/red_drawio.jpg" alt="Diagrama de red" />
     </div>
 
     <div class="info-box">
