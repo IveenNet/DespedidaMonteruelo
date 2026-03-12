@@ -1,5 +1,3 @@
-import redDiagram from '../assets/images/red_drawio.svg';
-
 export default {
   sectionLabel: null,
   icon:  '🌐',
@@ -34,7 +32,7 @@ export default {
     </div>
 
     <div class="network-diagram">
-      <img src="${redDiagram}" alt="Diagrama de red" />
+      <img src="./assets/images/red_drawio.svg" alt="Diagrama de red" />
     </div>
 
     <div class="info-box">
