@@ -1,0 +1,963 @@
+/* Slide: OpenClaw setup — cerebro + constelación + bootstrap */
+.openclaw-setup {
+  --oc-coral: #ff8a7a;
+  --oc-coral-2: #ff5e62;
+  --oc-mint: #5ee0d0;
+  --oc-violet: #a78bfa;
+  --oc-coral-glow: rgba(255, 138, 122, 0.22);
+  --oc-mint-glow: rgba(94, 224, 208, 0.2);
+}
+
+.openclaw-setup__sub {
+  max-width: 56rem;
+  line-height: 1.55;
+}
+
+/* ─── escenario “cerebro” ─── */
+.openclaw-setup .oc-brain-stage {
+  position: relative;
+  margin: 18px 0 20px;
+  padding: 28px 16px 32px;
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(167, 139, 250, 0.09) 0%, transparent 55%),
+    linear-gradient(165deg, #0c0e16 0%, #080a10 45%, #0b1018 100%);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 0 0 1px rgba(255, 94, 98, 0.06) inset,
+    0 24px 48px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  animation: ocBrainReveal 0.65s ease both;
+}
+
+.openclaw-setup .oc-brain-aura {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 30% 40%, var(--oc-coral-glow) 0%, transparent 42%),
+    radial-gradient(circle at 70% 55%, var(--oc-mint-glow) 0%, transparent 38%);
+  animation: ocAuraDrift 14s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.openclaw-setup .oc-constellation {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px) minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    '. sat-top .'
+    'sat-left core sat-right'
+    '. sat-bottom .';
+  gap: 10px 14px;
+  align-items: center;
+  justify-items: center;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.openclaw-setup .oc-const-ring {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  translate: -50% -50%;
+  border-radius: 50%;
+  border: 1px solid rgba(94, 224, 208, 0.12);
+  pointer-events: none;
+  z-index: 0;
+}
+.openclaw-setup .oc-const-ring--outer {
+  width: min(92%, 620px);
+  aspect-ratio: 1;
+  border-color: rgba(167, 139, 250, 0.14);
+  border-style: dashed;
+  animation: ocRingPulse 7s ease-in-out infinite;
+}
+.openclaw-setup .oc-const-ring--inner {
+  width: min(72%, 480px);
+  aspect-ratio: 1;
+  border-color: rgba(255, 138, 122, 0.1);
+  animation: ocRingPulse 5s ease-in-out infinite 0.4s;
+}
+
+.openclaw-setup .oc-sat {
+  position: relative;
+  z-index: 2;
+  padding: 11px 14px;
+  border-radius: 12px;
+  background: rgba(18, 20, 32, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  max-width: 200px;
+  text-align: center;
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+  animation: ocSatPop 0.55s ease both;
+}
+.openclaw-setup .oc-sat:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: rgba(255, 138, 122, 0.35);
+  box-shadow: 0 14px 36px rgba(255, 94, 98, 0.12);
+}
+.openclaw-setup .oc-sat--a { grid-area: sat-top; animation-delay: 0.05s; }
+.openclaw-setup .oc-sat--b { grid-area: sat-right; animation-delay: 0.12s; }
+.openclaw-setup .oc-sat--c { grid-area: sat-bottom; animation-delay: 0.19s; }
+.openclaw-setup .oc-sat--d { grid-area: sat-left; animation-delay: 0.26s; }
+
+.openclaw-setup .oc-sat-dot {
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--oc-mint), var(--oc-violet));
+  box-shadow: 0 0 12px var(--oc-mint-glow);
+  animation: ocDotPulse 2.4s ease-in-out infinite;
+}
+.openclaw-setup .oc-sat--b .oc-sat-dot { animation-delay: 0.3s; }
+.openclaw-setup .oc-sat--c .oc-sat-dot { animation-delay: 0.6s; }
+.openclaw-setup .oc-sat--d .oc-sat-dot { animation-delay: 0.9s; }
+
+.openclaw-setup .oc-sat-label {
+  display: block;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+.openclaw-setup .oc-sat-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.openclaw-setup .oc-core {
+  grid-area: core;
+  position: relative;
+  z-index: 3;
+  padding: 22px 20px 20px;
+  border-radius: 16px;
+  text-align: center;
+  background:
+    linear-gradient(145deg, rgba(255, 94, 98, 0.12) 0%, rgba(94, 224, 208, 0.08) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 0 40px rgba(255, 94, 98, 0.08),
+    0 0 60px rgba(94, 224, 208, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  animation: ocCoreGlow 4s ease-in-out infinite, ocSatPop 0.6s ease 0.08s both;
+}
+.openclaw-setup .oc-core::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 17px;
+  padding: 1px;
+  background: linear-gradient(130deg, var(--oc-coral-2), var(--oc-mint), var(--oc-violet));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.55;
+  pointer-events: none;
+  animation: ocBorderShimmer 5s ease-in-out infinite;
+}
+
+.openclaw-setup .oc-core-icon {
+  font-size: 32px;
+  line-height: 1;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 0 12px rgba(255, 138, 122, 0.35));
+}
+.openclaw-setup .oc-core-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  background: linear-gradient(90deg, #fff 0%, var(--oc-mint) 50%, var(--oc-coral) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.openclaw-setup .oc-core-tag {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  margin: 6px 0 12px;
+}
+.openclaw-setup .oc-core-copy {
+  font-size: 12px;
+  color: rgba(230, 237, 243, 0.82);
+  line-height: 1.5;
+  text-align: left;
+  margin: 0;
+}
+.openclaw-setup .oc-core-copy em {
+  color: var(--oc-mint);
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* leyenda flujo */
+.openclaw-setup .oc-flow-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 6px 0 20px;
+  animation: fadeUp 0.5s ease 0.15s both;
+}
+.openclaw-setup .oc-flow-chip {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+  max-width: 260px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(13, 17, 23, 0.6);
+}
+.openclaw-setup .oc-flow-chip span {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin-bottom: 4px;
+}
+.openclaw-setup .oc-flow-chip--in span { color: #7ad7ff; }
+.openclaw-setup .oc-flow-chip--mid span { color: #ffcb8e; }
+.openclaw-setup .oc-flow-chip--out span { color: var(--accent); }
+
+/* paneles instalación */
+.openclaw-setup .oc-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin: 18px 0;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .openclaw-setup .oc-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.openclaw-setup .oc-panel {
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(13, 17, 23, 0.82);
+  padding: 16px 18px;
+  animation: fadeUp 0.5s ease both;
+}
+.openclaw-setup .oc-panel--glow {
+  box-shadow: 0 0 0 1px rgba(167, 139, 250, 0.08), 0 16px 40px rgba(0, 0, 0, 0.25);
+}
+.openclaw-setup .oc-panel:nth-child(2) {
+  animation-delay: 0.08s;
+}
+.openclaw-setup .oc-panel-h {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--oc-mint);
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+.openclaw-setup .oc-panel-h strong {
+  color: var(--text);
+}
+
+.openclaw-setup .oc-steps-mini {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+.openclaw-setup .oc-steps-mini li {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 12px;
+  align-items: start;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.openclaw-setup .oc-steps-mini span.oc-sn {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  background: linear-gradient(145deg, rgba(255, 94, 98, 0.15), rgba(94, 224, 208, 0.1));
+  color: var(--oc-coral);
+  border: 1px solid rgba(255, 138, 122, 0.28);
+}
+
+/* ─── comandos · consola animada (PIRINEUS) ─── */
+.openclaw-setup .oc-cmd-section {
+  margin: 24px 0 10px;
+}
+.openclaw-setup .oc-cmd-heading {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+  animation: ocCmdHeadingIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.openclaw-setup .oc-cmd-hash {
+  display: inline-block;
+  margin-right: 8px;
+  font-weight: 800;
+  background: linear-gradient(
+    90deg,
+    var(--oc-mint),
+    var(--oc-violet),
+    var(--oc-coral),
+    var(--oc-mint)
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: ocHashShimmer 4s ease-in-out infinite;
+}
+.openclaw-setup .oc-cmd-lead {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.55;
+  max-width: 52rem;
+  margin-bottom: 14px;
+  animation: fadeUp 0.5s ease 0.08s both;
+}
+.openclaw-setup .oc-cmd-lead a {
+  color: var(--oc-mint);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.openclaw-setup .oc-cmd-lead a:hover {
+  color: #d4fff8;
+}
+
+.openclaw-setup .code-block.oc-cli-dock {
+  position: relative;
+  margin: 0;
+  border-radius: 14px;
+  border: none;
+  background: #060810;
+  box-shadow:
+    0 0 0 1px rgba(94, 224, 208, 0.18),
+    0 24px 56px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  perspective: 900px;
+  animation: ocDockIn 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.openclaw-setup .oc-cli-glow {
+  position: absolute;
+  inset: -50%;
+  z-index: 0;
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    rgba(255, 94, 98, 0.15),
+    rgba(167, 139, 250, 0.12),
+    rgba(94, 224, 208, 0.18),
+    rgba(255, 94, 98, 0.15)
+  );
+  opacity: 0.5;
+  animation: ocCliGlowSpin 10s linear infinite;
+  pointer-events: none;
+}
+.openclaw-setup .oc-cli-chrome {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 11px 14px;
+  background: linear-gradient(180deg, rgba(22, 26, 38, 0.98) 0%, #0c0f18 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.openclaw-setup .oc-cli-chrome-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+.openclaw-setup .oc-cli-logo {
+  font-size: 14px;
+  animation: ocLogoWiggle 2.8s ease-in-out infinite;
+}
+.openclaw-setup .oc-cli-title {
+  font-weight: 800;
+  color: #eef2ff;
+}
+.openclaw-setup .oc-cli-sep {
+  color: var(--muted);
+  opacity: 0.6;
+}
+.openclaw-setup .oc-cli-sub {
+  color: var(--oc-mint);
+  opacity: 0.9;
+}
+.openclaw-setup .oc-cli-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #b8fff5;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(94, 224, 208, 0.35);
+  background: rgba(94, 224, 208, 0.09);
+}
+.openclaw-setup .oc-cli-badge--link {
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.openclaw-setup .oc-cli-badge--link:hover {
+  background: rgba(94, 224, 208, 0.16);
+  border-color: rgba(94, 224, 208, 0.5);
+  box-shadow: 0 0 20px rgba(94, 224, 208, 0.12);
+}
+.openclaw-setup .oc-cli-badge--link:focus-visible {
+  outline: 2px solid var(--oc-mint);
+  outline-offset: 3px;
+}
+.openclaw-setup .oc-cli-badge-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--oc-mint);
+  box-shadow: 0 0 12px var(--oc-mint);
+  animation: ocLiveDot 1.15s ease-in-out infinite;
+}
+
+.openclaw-setup .oc-cli-body {
+  position: relative;
+  z-index: 2;
+  padding: 16px 16px 12px;
+  background: rgba(5, 8, 14, 0.92);
+}
+.openclaw-setup .oc-cli-scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2.75rem;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(94, 224, 208, 0.09) 48%,
+    transparent 96%
+  );
+  pointer-events: none;
+  z-index: 3;
+  animation: ocScanSweep 4.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.openclaw-setup .oc-cli-noise {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0.035;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: ocNoiseTick 0.2s steps(3) infinite;
+}
+
+.openclaw-setup .oc-cli-lines {
+  position: relative;
+  z-index: 4;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  line-height: 1.85;
+}
+/* Bloque en flujo normal: los <span> del comando siguen en una sola línea (flex rompía cada token). */
+.openclaw-setup .oc-cli-line {
+  display: block;
+  animation: ocLineReveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  margin: 0 0 0.28rem;
+}
+.openclaw-setup .oc-cli-line:last-of-type {
+  margin-bottom: 0;
+}
+.openclaw-setup .oc-cli-line:nth-child(1) { animation-delay: 0.03s; }
+.openclaw-setup .oc-cli-line:nth-child(2) { animation-delay: 0.06s; }
+.openclaw-setup .oc-cli-line:nth-child(3) { animation-delay: 0.09s; }
+.openclaw-setup .oc-cli-line:nth-child(4) { animation-delay: 0.12s; }
+.openclaw-setup .oc-cli-line:nth-child(5) { animation-delay: 0.15s; }
+.openclaw-setup .oc-cli-line:nth-child(6) { animation-delay: 0.18s; }
+.openclaw-setup .oc-cli-line:nth-child(7) { animation-delay: 0.21s; }
+.openclaw-setup .oc-cli-line:nth-child(8) { animation-delay: 0.24s; }
+.openclaw-setup .oc-cli-line:nth-child(9) { animation-delay: 0.27s; }
+.openclaw-setup .oc-cli-line:nth-child(10) { animation-delay: 0.3s; }
+.openclaw-setup .oc-cli-line:nth-child(11) { animation-delay: 0.33s; }
+.openclaw-setup .oc-cli-line:nth-child(12) { animation-delay: 0.36s; }
+.openclaw-setup .oc-cli-line:nth-child(13) { animation-delay: 0.39s; }
+.openclaw-setup .oc-cli-line:nth-child(14) { animation-delay: 0.42s; }
+.openclaw-setup .oc-cli-line:nth-child(15) { animation-delay: 0.45s; }
+.openclaw-setup .oc-cli-line:nth-child(16) { animation-delay: 0.48s; }
+.openclaw-setup .oc-cli-line:nth-child(17) { animation-delay: 0.51s; }
+.openclaw-setup .oc-cli-line:nth-child(18) { animation-delay: 0.54s; }
+.openclaw-setup .oc-cli-line:nth-child(19) { animation-delay: 0.57s; }
+.openclaw-setup .oc-cli-line:nth-child(20) { animation-delay: 0.6s; }
+.openclaw-setup .oc-cli-line:nth-child(21) { animation-delay: 0.63s; }
+.openclaw-setup .oc-cli-line--gap {
+  min-height: 0.55rem;
+  margin: 0.2rem 0 0.35rem;
+  animation: none;
+}
+.openclaw-setup .oc-cli-line--comment {
+  opacity: 0.92;
+  padding-left: 2px;
+  margin-top: 0.65rem;
+  margin-bottom: 0.35rem;
+}
+.openclaw-setup .oc-cli-line--comment:first-child {
+  margin-top: 0;
+}
+
+.openclaw-setup .oc-cli-line:not(.oc-cli-line--comment):not(.oc-cli-line--gap) .oc-cli-prompt::before {
+  content: '❯';
+  display: inline;
+  margin-right: 0.55rem;
+  color: var(--oc-mint);
+  font-weight: 700;
+  text-shadow: 0 0 14px rgba(94, 224, 208, 0.35);
+  animation: ocPromptHue 2.8s ease-in-out infinite;
+}
+.openclaw-setup .oc-cli-line:not(.oc-cli-line--comment):not(.oc-cli-line--gap) .oc-cli-prompt {
+  display: inline;
+}
+
+.openclaw-setup .oc-cli-footer {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(94, 224, 208, 0.2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+}
+.openclaw-setup .oc-cli-hint {
+  letter-spacing: 0.35em;
+  font-weight: 700;
+  color: rgba(94, 224, 208, 0.65);
+  animation: ocHintGlitch 4s steps(1) infinite;
+}
+.openclaw-setup .oc-cli-caret {
+  display: inline-block;
+  width: 8px;
+  height: 15px;
+  margin-left: 4px;
+  border-radius: 1px;
+  background: linear-gradient(180deg, var(--oc-coral), #ff9a8b);
+  box-shadow: 0 0 14px rgba(255, 94, 98, 0.45);
+  animation: ocCaret 0.95s step-end infinite;
+}
+
+@keyframes ocCmdHeadingIn {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    filter: none;
+  }
+}
+@keyframes ocHashShimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+@keyframes ocDockIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) rotateX(6deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+@keyframes ocCliGlowSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes ocLogoWiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-6deg);
+  }
+  75% {
+    transform: rotate(6deg);
+  }
+}
+@keyframes ocLiveDot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.85);
+  }
+}
+@keyframes ocScanSweep {
+  0% {
+    transform: translateY(-120%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(14rem);
+    opacity: 0;
+  }
+}
+@keyframes ocNoiseTick {
+  0% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(-1%, 1%);
+  }
+  66% {
+    transform: translate(1%, -0.5%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+@keyframes ocLineReveal {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+    filter: brightness(1.4);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    filter: none;
+  }
+}
+@keyframes ocPromptHue {
+  0%,
+  100% {
+    color: var(--oc-mint);
+    filter: brightness(1);
+  }
+  50% {
+    color: #9af5ea;
+    filter: brightness(1.15);
+  }
+}
+@keyframes ocHintGlitch {
+  0%,
+  90%,
+  100% {
+    opacity: 0.75;
+    transform: translate(0, 0);
+  }
+  92% {
+    opacity: 0.4;
+    transform: translate(2px, 0);
+  }
+  94% {
+    opacity: 0.85;
+    transform: translate(-1px, 0);
+  }
+}
+@keyframes ocCaret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .openclaw-setup .oc-cli-glow,
+  .openclaw-setup .oc-cli-scanline,
+  .openclaw-setup .oc-cli-noise,
+  .openclaw-setup .oc-cli-badge-pulse,
+  .openclaw-setup .oc-cli-caret,
+  .openclaw-setup .oc-cli-hint,
+  .openclaw-setup .oc-cmd-hash,
+  .openclaw-setup .oc-cli-logo {
+    animation: none !important;
+  }
+  .openclaw-setup .oc-cli-line {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .openclaw-setup .code-block.oc-cli-dock {
+    animation: none !important;
+  }
+  .openclaw-setup .oc-cmd-heading {
+    animation: none !important;
+    filter: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .openclaw-setup .oc-cli-lines {
+    font-size: 10.5px;
+  }
+  .openclaw-setup .oc-cli-chrome {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ClawHub */
+.openclaw-setup .oc-clawhub {
+  margin: 22px 0 18px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  border: 1px solid rgba(94, 224, 208, 0.25);
+  background:
+    linear-gradient(135deg, rgba(94, 224, 208, 0.09) 0%, rgba(167, 139, 250, 0.06) 100%);
+  animation: fadeUp 0.5s ease 0.1s both;
+}
+.openclaw-setup .oc-clawhub-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.openclaw-setup .oc-clawhub-title {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text);
+}
+.openclaw-setup .oc-clawhub-title span {
+  color: var(--oc-mint);
+}
+.openclaw-setup .oc-clawhub a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(94, 224, 208, 0.4);
+  color: var(--oc-mint);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.openclaw-setup .oc-clawhub a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(94, 224, 208, 0.15);
+}
+.openclaw-setup .oc-clawhub p {
+  font-size: 12px;
+  color: rgba(230, 237, 243, 0.78);
+  line-height: 1.6;
+  max-width: 54rem;
+}
+
+/* matriz de archivos */
+.openclaw-setup .oc-matrix-kicker {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  margin: 10px 0 10px;
+  letter-spacing: 0.4px;
+  line-height: 1.5;
+}
+.openclaw-setup .oc-matrix-kicker strong {
+  color: var(--text);
+}
+
+.openclaw-setup .oc-file-matrix {
+  margin: 16px 0 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+}
+.openclaw-setup .oc-file-card {
+  position: relative;
+  padding: 14px 14px 12px;
+  border-radius: 12px;
+  background: linear-gradient(165deg, #11131c 0%, #0a0c12 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 11px;
+  overflow: hidden;
+  animation: ocFileIn 0.48s ease both;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.openclaw-setup .oc-file-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--oc-violet), var(--oc-coral), var(--oc-mint));
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.openclaw-setup .oc-file-card:hover {
+  border-color: rgba(167, 139, 250, 0.35);
+  transform: translateY(-2px);
+}
+.openclaw-setup .oc-file-card:hover::after {
+  opacity: 1;
+}
+.openclaw-setup .oc-file-card:nth-child(1) { animation-delay: 0.02s; }
+.openclaw-setup .oc-file-card:nth-child(2) { animation-delay: 0.04s; }
+.openclaw-setup .oc-file-card:nth-child(3) { animation-delay: 0.06s; }
+.openclaw-setup .oc-file-card:nth-child(4) { animation-delay: 0.08s; }
+.openclaw-setup .oc-file-card:nth-child(5) { animation-delay: 0.1s; }
+.openclaw-setup .oc-file-card:nth-child(6) { animation-delay: 0.12s; }
+.openclaw-setup .oc-file-card:nth-child(7) { animation-delay: 0.14s; }
+.openclaw-setup .oc-file-card:nth-child(8) { animation-delay: 0.16s; }
+.openclaw-setup .oc-file-card:nth-child(9) { animation-delay: 0.18s; }
+
+.openclaw-setup .oc-file-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #e8c5ff;
+  margin-bottom: 7px;
+  word-break: break-all;
+}
+.openclaw-setup .oc-file-card p {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.openclaw-setup .oc-info-highlight {
+  border-left-color: var(--oc-mint);
+  background: linear-gradient(90deg, rgba(94, 224, 208, 0.06), rgba(23, 27, 35, 0.5));
+}
+
+@keyframes ocBrainReveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes ocAuraDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.85; }
+  33% { transform: translate(4%, -3%) scale(1.03); opacity: 1; }
+  66% { transform: translate(-3%, 2%) scale(0.98); opacity: 0.9; }
+}
+@keyframes ocRingPulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.65; }
+}
+@keyframes ocSatPop {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes ocDotPulse {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+@keyframes ocCoreGlow {
+  0%, 100% {
+    box-shadow:
+      0 0 40px rgba(255, 94, 98, 0.06),
+      0 0 60px rgba(94, 224, 208, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+  50% {
+    box-shadow:
+      0 0 52px rgba(255, 94, 98, 0.12),
+      0 0 72px rgba(94, 224, 208, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+}
+@keyframes ocBorderShimmer {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.85; }
+}
+@keyframes ocFileIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .openclaw-setup .oc-constellation {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'core'
+      'sat-top'
+      'sat-left'
+      'sat-right'
+      'sat-bottom';
+    max-width: none;
+  }
+  .openclaw-setup .oc-const-ring {
+    display: none;
+  }
+  .openclaw-setup .oc-sat {
+    max-width: none;
+    width: 100%;
+  }
+}

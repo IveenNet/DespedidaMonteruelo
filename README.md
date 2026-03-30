@@ -1,86 +1,164 @@
-# 🛡️ DespedidaMonteruelo — Análisis de Vulnerabilidades Automatizado
+# DespedidaMonteruelo — Análisis de vulnerabilidades automatizado
 
-> **PROYECTO DE INNOVACIÓN EDUCATIVA**  
-> Automatización en ciberseguridad con software libre  
-> CIFP Virgen de Gracia
-> Integrantes: Ivan, Luis y Sergio
-
----
-
-## 📋 Descripción
-
-Se ha implementado un sistema automatizado y continuo **(SOAR/ChatOps)** para analizar y detectar vulnerabilidades en aplicaciones web. El núcleo del proyecto es **Clawdbot**, un agente basado en IA que actúa como cerebro y orquestador central de la seguridad.
-
-El flujo de trabajo es el siguiente: **Wazuh** actúa como sensor monitorizando los eventos de las aplicaciones web (por ejemplo, subida de ficheros sospechosos). Cuando **Wazuh** detecta una anomalía, envía la alerta en bruto a **Clawdbot**. El bot, de forma autónoma, analiza la situación, consulta la API de **VirusTotal** para verificar hashes o dominios, y se comunica con la API de **OWASP ZAP** para comprobar vulnerabilidades o lanzar escaneos activos bajo demanda. Finalmente, el bot notifica al equipo vía **Telegram** con contexto detallado y opciones de respuesta interactiva. 
+**Proyecto de innovación educativa** · Ciberseguridad con software libre  
+**CIFP Virgen de Gracia** · Equipo: Iván, Luis y Sergio  
+*Reto 4 · Hacking ético y puesta en producción segura*
 
 ---
 
-## 🏗️ Arquitectura del Sistema
+## Qué hay en este repositorio
 
+Este proyecto tiene dos partes que conviven en el mismo repo:
+
+1. **Presentación web (GitHub Pages)** — Carpeta [`docs/`](docs/): diapositivas navegables con la arquitectura, el laboratorio SecOps, los flujos **n8n**, la configuración de **[OpenClaw](https://openclaw.ai/)** y el roadmap del SIEM (**Wazuh**). Es HTML, CSS y JavaScript modular, sin framework pesado.
+2. **Artefactos del laboratorio** — Plantillas descargables: `docker-compose` para **vm-scanner** y **vm-web**, exportes JSON de workflows n8n, y scripts auxiliares (por ejemplo el wrapper de Nuclei). Sirven para reproducir el entorno **PIRINEUS** descrito en las slides.
+
+La narrativa técnica del laboratorio: **n8n** orquesta escaneos con **OWASP ZAP** y **Nuclei**; el resultado se envía a **OpenClaw** (agente local con gateway, herramientas acotadas por *allowlist* y contexto del *workspace*). Desde ahí se enriquece con fuentes como **VirusTotal** o **Shodan**, se notifica por **Telegram** y se pueden generar **informes en el repositorio** (por ejemplo vía pull requests). **Wazuh** aparece en la presentación como línea evolutiva del SOC (correlación y alertas desde el SIEM), pendiente de despliegue según las slides.
+
+> **Nota sobre el nombre del agente:** en documentación y comunidad el proyecto se alinea con **OpenClaw** (antes conocido como Clawdbot / Moltbot). Donde veas referencias históricas a “Clawbot” en issues o slides antiguas, el rol es el mismo: cerebro del sistema frente a n8n como mero orquestador de escaneos.
+
+---
+
+## Arquitectura (visión simplificada)
+
+```mermaid
+flowchart TB
+  subgraph targets["Aplicaciones vulnerables (lab)"]
+    A[DVWA · Juice Shop · …]
+  end
+
+  subgraph stack["VM Scanner (Docker · secops-net)"]
+    N[n8n]
+    Z[OWASP ZAP]
+    Nu[Nuclei API]
+    N --> Z
+    N --> Nu
+  end
+
+  subgraph agente["Host / gateway"]
+    OC[OpenClaw]
+  end
+
+  A --> Z
+  Z --> N
+  Nu --> N
+  N -->|webhook / informe| OC
+  OC --> TG[Telegram · ChatOps]
+  OC --> GH[GitHub · informes / PRs]
+  OC --> ENR[VirusTotal · Shodan · …]
+
+  Wazuh[Wazuh SIEM · roadmap]
+  Wazuh -.->|futuro: correlación SOC| OC
 ```
-+-------------------+
-| Aplicaciones Web  | (DVWA, Juice Shop, WebGoat...)
-|   Vulnerables     |
-+--------+----------+
-         |
-         | 1. Logs, archivos subidos, monitorización
-         v
-+-------------------+        +-------------------+
-|   Wazuh (SIEM)    |------->|  Wazuh Dashboard  | (Interfaz SOC)
-| (Ojos y Oídos)    |        +-------------------+
-+--------+----------+
-         |
-         | 2. Alerta en bruto (Ej: Nuevo archivo sospechoso subido)
-         v
-+-------------------+ 3. Consulta  +-------------------+
-|                   |------------->|    VirusTotal     |
-|                   |<-------------|     (API Key)     |
-|                   |              +-------------------+
-|     Clawdbot      |
-|  (Cerebro IA /    | 4. Escaneo   +-------------------+
-|   Orquestador)    |------------->|    OWASP ZAP      |
-|                   |<-------------|   (API / Escáner) |
-+--------+----------+              +-------------------+
-         |
-         | 5. Alerta enriquecida + Opciones de acción
-         v
-+-------------------+
-|     Telegram      | (Ej: "¡Archivo malicioso! ¿Lanzo escaneo activo en ZAP o quieres ver información sobre lo que ocurre?")
-|  (ChatOps / SOC)  |
-+-------------------+
 
+---
+
+## Ver la presentación
+
+### En local
+
+Desde la raíz del repositorio (o desde `docs/`):
+
+```bash
+npx serve docs
 ```
 
----
+Abre la URL que indique la herramienta (suele ser `http://localhost:3000`). Navegación: teclas **←** **→**, menú lateral o botones inferiores.
 
-## 🛠️ Tecnologías utilizadas
+### En GitHub Pages
 
-| Herramienta | Rol |
-|-------------|-----|
-| **Clawdbot** | Orquestador del flujo de automatización: Recibe alertas, toma decisiones, interactúa con APIs externas y se comunica con el equipo. |
-| **OWASP ZAP** | Escáner de vulnerabilidades web (API) Realiza escaneos pasivos en segundo plano y escaneos activos a petición de Clawdbot. |
-| **VirusTotal** | Inteligencia de Amenazas. API consultada por Clawdbot para verificar la reputación de IPs, URLs y hashes de archivos detectados. |
-| **Wazuh** | SIEM — Recolecta logs, monitoriza la integridad de archivos e indexa los datos. Incluye su propio Dashboard.|
-| **Telegram Bot** | Interfaz de usuario. Canal bidireccional donde Clawdbot envía alertas contextualizadas y el equipo lanza comandos. |
-| **Docker-compose** | Infraestructura. Contenedorización de todo el laboratorio para un despliegue rápido y replicable con docker-compose |
-| **DVWA / Juice Shop / WebGoat** | Aplicaciones web vulnerables por diseño para generar la telemetría y alertas. |
+Tras configurar Pages en el repositorio, el sitio publica el contenido de **`docs/`**. En GitHub: **Settings → Pages → Build and deployment** (origen: GitHub Actions o rama `main` con carpeta `/docs` según tu configuración).
+
+El workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) despliega automáticamente cuando hay cambios bajo `docs/**` en la rama `main`.
 
 ---
 
-## 🌿 Flujo de trabajo con Git Flow
+## Cómo está organizado el código
 
-> ⚠️ **Importante para el equipo:** Este proyecto usa **Git Flow**. Por favor, leed esta sección antes de tocar nada.
-
-### Ramas principales
-
-| Rama | Propósito |
+| Ruta | Propósito |
 |------|-----------|
-| `main` | Código estable y revisado. **Nunca se toca directamente.** |
-| `develop` | Rama de integración. **Aquí se une todo el trabajo del equipo.** |
+| [`docs/index.html`](docs/index.html) | Shell de la app: barra superior, sidebar, contenedor de slides. |
+| [`docs/assets/js/app.js`](docs/assets/js/app.js) | Navegación entre slides, progreso, *sidebar*, utilidades (p. ej. copiar al portapapeles). |
+| [`docs/assets/js/slides.js`](docs/assets/js/slides.js) | **Orden único de las diapositivas**: importa cada módulo en `slides/` y exporta el array `slides`. |
+| [`docs/slides/`](docs/slides/) | Un archivo `.js` por slide: export default con `sectionLabel`, `icon`, `title`, `sub`, `dots`, `content` (HTML). |
+| [`docs/assets/css/`](docs/assets/css/) | Estilos globales y por sección (`intro-overview`, `infra-targets`, `secops-lab`, `openclaw-setup`, …). |
+| [`docs/assets/downloads/`](docs/assets/downloads/) | Ficheros para descargar: n8n JSON, `docker-compose`, `.env.example` del scanner. |
+
+**Añadir una diapositiva nueva:** crea `docs/slides/<carpeta>/nombre.js`, importa el módulo en `docs/assets/js/slides.js` y añádelo al array `slides` en el orden deseado. Si hace falta estilo dedicado, enlaza una hoja en `docs/index.html`.
+
+Orden actual del *deck*:
+
+1. Introducción — visión general  
+2. Infraestructura — objetivos / red  
+3. Infraestructura — OPNsense  
+4. SecOps — lab (VM Scanner)  
+5. SecOps — workflows n8n (Juice Shop / DVWA)  
+6. OpenClaw — setup  
+7. OpenClaw — workspace  
+8. OpenClaw — alertas  
+9. SIEM / SOC — Wazuh (estado en slides)
 
 ---
 
-### 🔧 Inicializar Git Flow (solo la primera vez por máquina)
+## Laboratorio y descargas
+
+| Recurso | Ubicación |
+|---------|-----------|
+| Stack scanner (n8n, ZAP, Nuclei, …) | [`docs/assets/downloads/vm-scanner/`](docs/assets/downloads/vm-scanner/) · incluye [`docker-compose.yml`](docs/assets/downloads/vm-scanner/docker-compose.yml) y [`.env.example`](docs/assets/downloads/vm-scanner/.env.example) |
+| Stack aplicaciones web de práctica | [`docs/assets/downloads/vm-web/docker-compose.yml`](docs/assets/downloads/vm-web/docker-compose.yml) |
+| Workflow n8n · Juice Shop | [`docs/assets/downloads/n8n/pirineus-juiceshop-full-scan.json`](docs/assets/downloads/n8n/pirineus-juiceshop-full-scan.json) |
+| Workflow n8n · DVWA | [`docs/assets/downloads/n8n/pirineus-dvwa-full-scan.json`](docs/assets/downloads/n8n/pirineus-dvwa-full-scan.json) |
+
+Los JSON de n8n suelen traer placeholders del tipo `REPLACE_WITH_*`; tras importarlos, sustituye credenciales y URLs por variables de entorno o secretos de tu instancia.
+
+Instalación del agente (referencia rápida, alineada con [openclaw.ai](https://openclaw.ai/)):
+
+```bash
+curl -fsSL https://openclaw.ai/install.sh | bash
+# o: npm i -g openclaw
+openclaw onboard
+```
+
+El gateway persistente, `systemd --user` y la *allowlist* de acciones están detallados en la slide de setup dentro de `docs/`.
+
+---
+
+## Variables de entorno y secretos
+
+**No subas claves al repositorio.** Usa `.env` en tus máquinas y en los hosts Docker, y **GitHub Secrets** para CI si más adelante automatizas despliegues que las necesiten.
+
+Para el stack del scanner, parte de [`docs/assets/downloads/vm-scanner/.env.example`](docs/assets/downloads/vm-scanner/.env.example) y copia a `.env` en ese mismo contexto de despliegue.
+
+Ejemplo de integraciones habituales (nombres orientativos; revisa cada compose y workflow):
+
+```env
+# VirusTotal
+VIRUSTOTAL_API_KEY=tu_clave
+
+# Telegram
+TELEGRAM_BOT_TOKEN=tu_token
+TELEGRAM_CHAT_ID=tu_chat_id
+
+# OWASP ZAP API
+ZAP_API_KEY=tu_clave_zap
+```
+
+- [Documentación OWASP ZAP API](https://www.zaproxy.org/docs/api/)  
+- [VirusTotal API](https://docs.virustotal.com/reference/overview)  
+- [Wazuh](https://documentation.wazuh.com/) (cuando integres el SIEM)
+
+---
+
+## Flujo de trabajo con Git
+
+El equipo usa **Git Flow**. Resumen operativo:
+
+| Rama | Uso |
+|------|-----|
+| `main` | Código estable. **Sin commits directos.** |
+| `develop` | Integración del equipo. **Sin trabajar directamente sin feature.** |
+
+**Primera vez en cada máquina:**
 
 ```bash
 git clone git@github.com:IveenNet/DespedidaMonteruelo.git
@@ -88,158 +166,42 @@ cd DespedidaMonteruelo
 git flow init
 ```
 
-> Durante el `init` acepta los valores por defecto pulsando **Enter** en todo. Usará `main` como rama de producción y `develop` como rama de integración.
+(Acepta valores por defecto: producción `main`, desarrollo `develop`.)
 
----
-
-### Cómo trabajar día a día (paso a paso)
-
-#### 1️⃣ Antes de empezar cualquier tarea — actualizar develop
+**Ciclo diario:**
 
 ```bash
-git checkout develop
-git pull origin develop
-```
-
-#### 2️⃣ Iniciar una nueva tarea con Git Flow
-
-```bash
+git checkout develop && git pull origin develop
 git flow feature start nombre-descriptivo
-```
-
-> **Ejemplos:**
-> ```bash
-> git flow feature start configurar-owasp-zap
-> git flow feature start flujo-clawbot-escaneo
-> git flow feature start integracion-telegram
-> git flow feature start integracion-virustotal
-> ```
-> Esto crea automáticamente la rama `feature/nombre-descriptivo` desde `develop`.
-
-#### 3️⃣ Trabajar y guardar cambios
-
-```bash
-git add .
-git commit -m "feat: descripción corta de lo que hiciste"
-```
-
-> **Prefijos recomendados para commits:**
-> - `feat:` → nueva funcionalidad
-> - `fix:` → corrección de error
-> - `docs:` → cambios en documentación
-> - `chore:` → tareas de mantenimiento
-
-#### 4️⃣ Subir tu rama a GitHub
-
-```bash
+# … commits …
 git push origin feature/nombre-descriptivo
-```
-
-#### 5️⃣ Finalizar la feature (merge a develop)
-
-```bash
 git flow feature finish nombre-descriptivo
 git push origin develop
 ```
 
-> Esto hace el merge a `develop` y elimina la rama `feature/` automáticamente.
+**Commits:** prefijos útiles `feat:`, `fix:`, `docs:`, `chore:`.
+
+**Reglas:** no *push* directo a `main` ni a `develop`; siempre *feature* desde `develop`; *pull* de `develop` antes de abrir una feature nueva.
+
+Más contexto: [Git Flow (nvie)](https://nvie.com/posts/a-successful-git-branching-model/).
 
 ---
 
-### 🔁 Diagrama del flujo
+## Roadmap coherente con las slides
 
-```
-main
- └── develop  ←─────────────────────────────────────────┐
-       └── feature/configurar-owasp-zap                  │
-       └── feature/flujo-clawbot-escaneo ────────────────┘ (feature finish)
-       └── feature/integracion-virustotal
-       └── feature/integracion-telegram
-```
+- Consolidar **OpenClaw** en el host de confianza (gateway, *approvals*, integración con n8n y Telegram).
+- Mantener exportes **n8n** y la doc del lab al día en `docs/assets/downloads/`.
+- Desplegar **Wazuh** y reglas que enlacen hallazgos del laboratorio con el flujo SOC (ver slide SIEM).
 
 ---
 
-### ❌ Reglas que NO se deben romper
+## Recursos
 
-- **Nunca** hacer `push` directo a `main` o `develop`
-- **Nunca** trabajar directamente en `develop`
-- **Siempre** usar `git flow feature start` para iniciar una tarea
-- **Siempre** hacer `pull` de `develop` antes de iniciar una feature nueva
-
----
-
-## 🚀 Instalación y puesta en marcha
-
-```bash
-# 1. Clonar el repositorio
-git clone git@github.com:IveenNet/DespedidaMonteruelo.git
-cd DespedidaMonteruelo
-
-# 2. Inicializar Git Flow
-git flow init
-
-# 3. Levantar el entorno (próximamente)
-docker compose up -d
-```
+- [OpenClaw](https://openclaw.ai/) — instalación, onboarding y documentación del agente  
+- [n8n](https://n8n.io/) — orquestación de flujos  
+- [OWASP ZAP](https://www.zaproxy.org/) · [ProjectDiscovery Nuclei](https://github.com/projectdiscovery/nuclei)  
+- [GitHub Pages](https://pages.github.com/) — alojamiento del sitio estático en `docs/`
 
 ---
 
-## 🔑 Configuración de API Keys
-
-El proyecto requiere claves de API para algunas integraciones. **Nunca subas las claves al repositorio.** Crea un fichero `.env` en la raíz del proyecto (ya está en `.gitignore`):
-
-```env
-# VirusTotal
-VIRUSTOTAL_API_KEY=tu_clave_aqui
-
-# Telegram Bot
-TELEGRAM_BOT_TOKEN=tu_token_aqui
-TELEGRAM_CHAT_ID=tu_chat_id_aqui
-
-# OWASP ZAP
-ZAP_API_KEY=tu_clave_zap_aqui
-```
-
-### Obtener tu API Key de VirusTotal
-
-1. Regístrate en [https://www.virustotal.com](https://www.virustotal.com)
-2. Ve a tu perfil → **API Key**
-3. Copia la clave y pégala en el `.env`
-
-> La cuenta gratuita permite **500 consultas/día** y **4 consultas/minuto**, suficiente para el laboratorio.
-
-### ¿Para qué usamos VirusTotal?
-
-Clawbot consulta la API de VirusTotal para enriquecer los hallazgos de OWASP ZAP:
-- Verificar si una URL o dominio tiene reputación maliciosa
-- Analizar hashes de ficheros sospechosos encontrados durante el escaneo
-- Añadir contexto de amenaza a las alertas enviadas al SOC y Telegram
-
----
-
-## 📁 Estructura del proyecto (planificada)
-
-```
-DespedidaMonteruelo/
-├── clawbot/          # Flujos y configuración de Clawbot
-├── zap/              # Configuración y scripts de OWASP ZAP
-├── wazuh/            # Reglas y configuración del SIEM
-├── docker/           # Compose y Dockerfiles del laboratorio
-├── docs/             # Documentación técnica del proyecto
-├── .env.example      # Plantilla de variables de entorno
-└── README.md
-```
-
----
-
-## 📚 Recursos
-
-- [Documentación OWASP ZAP API](https://www.zaproxy.org/docs/api/)
-- [Wazuh Documentation](https://documentation.wazuh.com/)
-- [VirusTotal API Docs](https://docs.virustotal.com/reference/overview)
-- [Git Flow — Guía visual](https://nvie.com/posts/a-successful-git-branching-model/)
-
----
-
-*Reto 4 · Hacking Ético y Puesta en Producción Segura · Complejidad Media · ~15h*
-- Cambio de prueba desde Pirineus-bot
+*Proyecto académico de referencia: automatización SOAR / ChatOps con componentes abiertos y un agente local como capa de razonamiento y acción.*
