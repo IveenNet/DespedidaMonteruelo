@@ -1,5 +1,5 @@
 export default {
-  sectionLabel: null,
+  sectionLabel: 'OpenClaw',
   icon:  '🧠',
   title: 'Workspace',
   sub:   'sesiones · informes',
