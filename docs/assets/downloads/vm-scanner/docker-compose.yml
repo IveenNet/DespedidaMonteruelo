@@ -1,0 +1,137 @@
+services:
+
+  # ─── OWASP ZAP ─────────────────────────────────────────────
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:stable
+    container_name: owasp-zap
+    restart: unless-stopped
+    mem_limit: 4g
+    mem_reservation: 1g
+    command: >
+      zap.sh -daemon -host 0.0.0.0 -port 8090 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true -config api.key=${ZAP_API_KEY} -config api.disablekey=false -config connection.timeoutInSecs=300
+    ports:
+      - "8090:8090"
+    environment:
+      - ZAP_API_KEY=${ZAP_API_KEY}
+      - DMZ_DVWA=${DMZ_DVWA}
+      - DMZ_JUICESHOP=${DMZ_JUICESHOP}
+      - _JAVA_OPTIONS=-Xmx2g
+    volumes:
+      - zap-data:/zap/wrk
+      - zap-reports:/zap/reports
+    networks:
+      - secops-net
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8090/JSON/core/view/version/ || exit 1" ]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+  # ─── NUCLEI ────────────────────────────────────────────────
+  nuclei:
+    image: projectdiscovery/nuclei:latest
+    container_name: nuclei
+    restart: unless-stopped
+    entrypoint: [ "sleep", "infinity" ]
+    environment:
+      - DMZ_DVWA=${DMZ_DVWA}
+      - DMZ_JUICESHOP=${DMZ_JUICESHOP}
+    volumes:
+      - nuclei-templates:/root/nuclei-templates
+      - nuclei-reports:/reports
+    networks:
+      - secops-net
+
+  # ─── NUCLEI TEMPLATE UPDATER (cada 24h) ────────────────────
+  nuclei-updater:
+    image: projectdiscovery/nuclei:latest
+    container_name: nuclei-updater
+    restart: unless-stopped
+    entrypoint: >
+      sh -c "while true; do
+        nuclei -update-templates -ud /root/nuclei-templates &&
+        echo \"[updater] Templates OK\" >> /root/nuclei-templates/update.log 2>&1;
+        sleep 86400;
+      done"
+    volumes:
+      - nuclei-templates:/root/nuclei-templates
+    networks:
+      - secops-net
+
+  # ─── NUCLEI API WRAPPER ────────────────────────────────────
+  nuclei-api:
+    image: projectdiscovery/nuclei:latest
+    container_name: nuclei-api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - DMZ_DVWA=${DMZ_DVWA}
+      - DMZ_JUICESHOP=${DMZ_JUICESHOP}
+    volumes:
+      - nuclei-templates:/root/nuclei-templates
+      - nuclei-reports:/reports
+      - ./nuclei-api.py:/app/nuclei-api.py
+    working_dir: /app
+    entrypoint: >
+      sh -c "apk add python3 py3-pip -q &&
+             pip install flask -q --break-system-packages &&
+             python3 nuclei-api.py"
+    networks:
+      - secops-net # nuclei-api debe estar en secops-net (DNS interno)
+    depends_on:
+      - nuclei-updater
+
+  # ─── N8N ───────────────────────────────────────────────────
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://${SECOPS_IP}:5678
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
+      - N8N_LOG_LEVEL=info
+      - N8N_COMMUNITY_PACKAGES_ENABLED=true
+      - N8N_SECURE_COOKIE=false
+      - N8N_ALLOW_EXEC=true
+      - GENERIC_TIMEZONE=Europe/Madrid
+      - TZ=Europe/Madrid
+      - ZAP_API_KEY=${ZAP_API_KEY}
+      - OPENCLAW_TOKEN=${OPENCLAW_TOKEN}
+      - OPENCLAW_URL=http://host.docker.internal:${OPENCLAW_PORT:-18789}
+      - DMZ_DVWA=${DMZ_DVWA}
+      - DMZ_JUICESHOP=${DMZ_JUICESHOP}
+    volumes:
+      - n8n-data:/home/node/.n8n
+      - zap-reports:/zap-reports:ro
+      - nuclei-reports:/home/node/.n8n-files/nuclei-reports:ro
+    networks:
+      - secops-net
+    depends_on:
+      - zap
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+# ─── VOLÚMENES ─────────────────────────────────────────────
+volumes:
+  zap-data:
+  zap-reports:
+  nuclei-templates:
+  nuclei-reports:
+  n8n-data:
+
+    # ─── RED ───────────────────────────────────────────────────
+networks:
+  secops-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24

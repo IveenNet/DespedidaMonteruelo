@@ -1,18 +1,24 @@
 // Importa todos los slides en orden
 // Para añadir uno nuevo: crea el archivo en /slides/ e impórtalo aquí
 
-import slide00 from '../../slides/00-overview.js';
-import slide01 from '../../slides/01-targets.js';
-import slide02 from '../../slides/02-opnsense.js';
-import slide03 from '../../slides/03-scanner.js';
-import slide04 from '../../slides/04-siem.js';
-import slide05 from '../../slides/05-alertas.js';
+import overview from '../../slides/intro/overview.js';
+import targets from '../../slides/infraestructura/targets.js';
+import opnsense from '../../slides/infraestructura/opnsense.js';
+import secopsLab from '../../slides/secops/lab.js';
+import secopsWorkflows from '../../slides/secops/workflows.js';
+import openclawSetup from '../../slides/openclaw/setup.js';
+import openclawWorkspace from '../../slides/openclaw/workspace.js';
+import openclawAlertas from '../../slides/openclaw/alertas.js';
+import siem from '../../slides/soc/siem.js';
 
 export const slides = [
-  slide00,
-  slide01,
-  slide02,
-  slide03,
-  slide04,
-  slide05,
+  overview,
+  targets,
+  opnsense,
+  secopsLab,
+  secopsWorkflows,
+  openclawSetup,
+  openclawWorkspace,
+  openclawAlertas,
+  siem,
 ];

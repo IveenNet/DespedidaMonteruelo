@@ -6,9 +6,9 @@ export default {
   dots:  [false, false],
 
   content: `
-    <div class="slide-eyebrow">Issue #8 · Alertas</div>
+    <div class="slide-eyebrow">OpenClaw · Respuesta</div>
     <div class="slide-heading">VirusTotal · Telegram <span class="badge badge-todo">pendiente</span></div>
-    <div class="slide-sub">VirusTotal enriquece los hallazgos de ZAP analizando URLs y hashes. Telegram notifica al equipo en tiempo real cuando se detecta una vulnerabilidad.</div>
+    <div class="slide-sub">El agente enriquece hallazgos (VirusTotal) y entrega un resumen accionable (Telegram). Así el SOC recibe contexto, prioridad y próximos pasos sin leer logs crudos.</div>
 
     <div class="cards">
       <div class="card">
