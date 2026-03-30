@@ -1,0 +1,922 @@
+{
+  "name": "PIRINEUS - JuiceShop Full Scan v6",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, -100]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 0 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule 00:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [0, 100]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "pirineus-scan",
+        "responseMode": "onReceived",
+        "responseData": "firstEntryJson"
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [0, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    target:    'http://203.0.113.10:3000',\n    zapKey:    'REPLACE_WITH_ZAP_API_KEY',\n    zapBase:   'http://owasp-zap:8090',\n    nucleiApi: 'http://nuclei-api:5000',\n    startedAt: new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' })\n  }\n}];"
+      },
+      "id": "config",
+      "name": "Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 100]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.zapBase }}/JSON/core/action/newSession/?apikey={{ $json.zapKey }}&name=juiceshop&overwrite=true",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "zap-session",
+      "name": "ZAP Nueva Sesion",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [460, 100],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const err = $input.first().json;\nconst msg = `❌ *PIRINEUS CYBER-MONITOR — ERROR*\\n\\nFalló en: *ZAP Nueva Sesión*\\nMotivo: ${JSON.stringify(err).substring(0,200)}\\nFecha: ${new Date().toLocaleString('es-ES',{timeZone:'Europe/Madrid'})}`;\nreturn [{ json: { mensaje: msg, error: true } }];"
+      },
+      "id": "err-session",
+      "name": "Error: ZAP Sesión",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config').first().json.zapBase }}/JSON/core/action/accessUrl/?apikey={{ $('Config').first().json.zapKey }}&url={{ $('Config').first().json.target }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "zap-access",
+      "name": "ZAP Acceder URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [680, 100],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const err = $input.first().json;\nconst msg = `❌ *PIRINEUS CYBER-MONITOR — ERROR*\\n\\nFalló en: *ZAP Acceder URL*\\nMotivo: ${JSON.stringify(err).substring(0,200)}\\nTarget: ${$('Config').first().json.target}\\nFecha: ${new Date().toLocaleString('es-ES',{timeZone:'Europe/Madrid'})}`;\nreturn [{ json: { mensaje: msg, error: true } }];"
+      },
+      "id": "err-access",
+      "name": "Error: ZAP Acceso",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config').first().json.zapBase }}/JSON/spider/action/scan/?apikey={{ $('Config').first().json.zapKey }}&url={{ $('Config').first().json.target }}&recurse=true&maxChildren=10",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "zap-spider",
+      "name": "ZAP Iniciar Spider",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [900, 100],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const err = $input.first().json;\nconst msg = `❌ *PIRINEUS CYBER-MONITOR — ERROR*\\n\\nFalló en: *ZAP Spider*\\nMotivo: ${JSON.stringify(err).substring(0,200)}\\nFecha: ${new Date().toLocaleString('es-ES',{timeZone:'Europe/Madrid'})}`;\nreturn [{ json: { mensaje: msg, error: true } }];"
+      },
+      "id": "err-spider",
+      "name": "Error: ZAP Spider",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const id = $input.first().json.scan;\nif (id === undefined || id === null) throw new Error('Sin Spider ID: ' + JSON.stringify($input.first().json));\nreturn [{ json: { spiderScanId: String(id) } }];"
+      },
+      "id": "save-spider-id",
+      "name": "Guardar Spider ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 100]
+    },
+    {
+      "parameters": {
+        "amount": 20,
+        "unit": "seconds"
+      },
+      "id": "wait-spider",
+      "name": "Espera Spider",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [1320, 100],
+      "webhookId": "b8e6239a-a6c9-48cd-8de1-7cbc99badcdc"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config').first().json.zapBase }}/JSON/spider/view/status/?apikey={{ $('Config').first().json.zapKey }}&scanId={{ $json.spiderScanId }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "zap-spider-status",
+      "name": "ZAP Estado Spider",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1520, 100],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const err = $input.first().json;\nconst msg = `❌ *PIRINEUS CYBER-MONITOR — ERROR*\\n\\nFalló en: *ZAP Estado Spider*\\nMotivo: ${JSON.stringify(err).substring(0,200)}\\nFecha: ${new Date().toLocaleString('es-ES',{timeZone:'Europe/Madrid'})}`;\nreturn [{ json: { mensaje: msg, error: true } }];"
+      },
+      "id": "err-spider-status",
+      "name": "Error: ZAP Estado Spider",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1520, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "100",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "spider-done",
+      "name": "Spider 100%?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1740, 100]
+    },
+    {
+      "parameters": {
+        "amount": 20,
+        "unit": "seconds"
+      },
+      "id": "wait-spider-retry",
+      "name": "Espera Spider Retry",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [1960, 300],
+      "webhookId": "54f5f310-791e-4174-a1e2-65fe93dc2764"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config').first().json.zapBase }}/JSON/ascan/action/scan/?apikey={{ $('Config').first().json.zapKey }}&url={{ $('Config').first().json.target }}&recurse=true",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "zap-ascan",
+      "name": "ZAP Iniciar ActiveScan",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1960, 100],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const err = $input.first().json;\nconst msg = `❌ *PIRINEUS CYBER-MONITOR — ERROR*\\n\\nFalló en: *ZAP Active Scan*\\nMotivo: ${JSON.stringify(err).substring(0,200)}\\nFecha: ${new Date().toLocaleString('es-ES',{timeZone:'Europe/Madrid'})}`;\nreturn [{ json: { mensaje: msg, error: true } }];"
+      },
+      "id": "err-ascan",
+      "name": "Error: ZAP ActiveScan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1960, 500]
+    },
+    {
+      "parameters": {
+        "jsCode": "const id = $input.first().json.scan;\nif (id === undefined || id === null) throw new Error('Sin AScan ID: ' + JSON.stringify($input.first().json));\nreturn [{ json: { ascanId: String(id) } }];"
+      },
+      "id": "save-ascan-id",
+      "name": "Guardar AScan ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2180, 100]
+    },
+    {
+      "parameters": {
+        "amount": 45,
+        "unit": "seconds"
+      },
+      "id": "wait-ascan",
+      "name": "Espera AScan",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [2380, 100],
+      "webhookId": "73d465bc-7dc4-42db-8593-70030bb1029d"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config').first().json.zapBase }}/JSON/ascan/view/status/?apikey={{ $('Config').first().json.zapKey }}&scanId={{ $json.ascanId }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "zap-ascan-status",
+      "name": "ZAP Estado AScan",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [2580, 100],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const err = $input.first().json;\nconst msg = `❌ *PIRINEUS CYBER-MONITOR — ERROR*\\n\\nFalló en: *ZAP Estado Active Scan*\\nMotivo: ${JSON.stringify(err).substring(0,200)}\\nFecha: ${new Date().toLocaleString('es-ES',{timeZone:'Europe/Madrid'})}`;\nreturn [{ json: { mensaje: msg, error: true } }];"
+      },
+      "id": "err-ascan-status",
+      "name": "Error: ZAP Estado AScan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2580, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "c2",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "100",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "ascan-done",
+      "name": "AScan 100%?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2800, 100]
+    },
+    {
+      "parameters": {
+        "amount": 45,
+        "unit": "seconds"
+      },
+      "id": "wait-ascan-retry",
+      "name": "Espera AScan Retry",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [3020, 300],
+      "webhookId": "148dfc0f-447e-4f2b-9106-8fec9bed7fa0"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config').first().json.zapBase }}/JSON/core/view/alerts/?apikey={{ $('Config').first().json.zapKey }}&baseurl={{ $('Config').first().json.target }}&start=0&count=500",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "zap-alerts",
+      "name": "ZAP Obtener Alertas",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [3020, 100],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const err = $input.first().json;\nconst msg = `❌ *PIRINEUS CYBER-MONITOR — ERROR*\\n\\nFalló en: *ZAP Obtener Alertas*\\nMotivo: ${JSON.stringify(err).substring(0,200)}\\nFecha: ${new Date().toLocaleString('es-ES',{timeZone:'Europe/Madrid'})}`;\nreturn [{ json: { mensaje: msg, error: true } }];"
+      },
+      "id": "err-alerts",
+      "name": "Error: ZAP Alertas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3020, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const alerts = $input.first().json.alerts || [];\nreturn [{ json: { zapAlerts: alerts, zapTotal: alerts.length } }];"
+      },
+      "id": "save-alerts",
+      "name": "Guardar Alertas ZAP",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3240, 100]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').first().json.nucleiApi }}/scan",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"target\": \"{{ $('Config').first().json.target }}\", \"severity\": \"info,low,medium,high,critical\" }",
+        "options": {
+          "timeout": 360000
+        }
+      },
+      "id": "nuclei-scan",
+      "name": "Nuclei Scan",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [3460, 100],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const err = $input.first().json;\nconst msg = `⚠️ *PIRINEUS CYBER-MONITOR — WARNING*\\n\\nFalló en: *Nuclei Scan*\\nSe enviará el informe solo con datos ZAP.\\nMotivo: ${JSON.stringify(err).substring(0,200)}\\nFecha: ${new Date().toLocaleString('es-ES',{timeZone:'Europe/Madrid'})}`;\nreturn [{ json: { nucleiFindings: [], nucleiTotal: 0, nucleiError: msg } }];"
+      },
+      "id": "err-nuclei",
+      "name": "Error: Nuclei (continuar)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const resp = $input.first().json;\nconst findings = (resp.findings || []).map(f => ({\n  name:        f.info?.name        || f['template-id'] || 'Unknown',\n  severity:    f.info?.severity    || 'info',\n  host:        f.host              || '',\n  matched:     f['matched-at']     || f.matched || '',\n  description: f.info?.description || '',\n  templateId:  f['template-id']    || '',\n  tags:       (f.info?.tags        || []).join(', '),\n  reference:  (f.info?.reference   || []).join(', ')\n}));\nreturn [{ json: { nucleiFindings: findings, nucleiTotal: findings.length } }];"
+      },
+      "id": "parse-nuclei",
+      "name": "Parsear Nuclei",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3680, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ── Datos de entrada ──────────────────────────────────\nconst alerts   = $('Guardar Alertas ZAP').first().json.zapAlerts    || [];\nconst findings = $('Parsear Nuclei').first().json.nucleiFindings     || [];\nconst nucleiErr = $('Parsear Nuclei').first().json.nucleiError       || null;\nconst target   = $('Config').first().json.target;\nconst startedAt = $('Config').first().json.startedAt;\n\n// ── Contadores ZAP ────────────────────────────────────\nconst zHigh = alerts.filter(a => a.risk === 'High').length;\nconst zMed  = alerts.filter(a => a.risk === 'Medium').length;\nconst zLow  = alerts.filter(a => a.risk === 'Low').length;\nconst zInfo = alerts.filter(a => a.risk === 'Informational').length;\n\nconst zapByName = {};\nalerts.forEach(a => { if (!zapByName[a.name]) zapByName[a.name] = a; });\nconst sevOrder = { High:0, Medium:1, Low:2, Informational:3 };\nconst zapUniq = Object.values(zapByName).sort((a,b) => (sevOrder[a.risk]||9)-(sevOrder[b.risk]||9));\n\nconst zapDetalle = zapUniq\n  .filter(a => a.risk !== 'Informational')\n  .slice(0, 8)\n  .map(a => {\n    const e = a.risk==='High'?'🔴':a.risk==='Medium'?'🟡':'🔵';\n    const desc = (a.description || '').split('.')[0].trim().substring(0,120);\n    const url  = (a.url || '').replace('http://203.0.113.10:3000','') || '/';\n    return `${e} *[${a.risk}] ${a.name}*\\n   📍 ${url}\\n   💡 ${desc}.`;\n  });\n\n// ── Contadores Nuclei ─────────────────────────────────\nconst nCrit = findings.filter(f => f.severity==='critical').length;\nconst nHigh = findings.filter(f => f.severity==='high').length;\nconst nMed  = findings.filter(f => f.severity==='medium').length;\nconst nLow  = findings.filter(f => f.severity==='low').length;\n\nconst nucDetalle = findings\n  .filter(f => ['critical','high','medium','low'].includes(f.severity))\n  .slice(0, 8)\n  .map(f => {\n    const e = f.severity==='critical'?'💀':f.severity==='high'?'🔴':f.severity==='medium'?'🟡':'🔵';\n    const desc = (f.description || '').split('.')[0].trim().substring(0,120);\n    const matched = (f.matched || '').replace('http://203.0.113.10:3000','') || '/';\n    return `${e} *[${f.severity.toUpperCase()}] ${f.name}*\\n   📍 ${matched}\\n   💡 ${desc}.`;\n  });\n\n// ── Estado global ─────────────────────────────────────\nconst totalCrit = nCrit;\nconst totalHigh = zHigh + nHigh;\nconst totalMed  = zMed  + nMed;\nconst totalLow  = zLow  + nLow;\nconst estado    = totalCrit>0 ? '🚨 CRÍTICO'\n                : totalHigh>0 ? '❌ ALTO RIESGO'\n                : totalMed>0  ? '⚠️ MODERADO'\n                : '✅ ESTABLE';\n\nconst zapSeccion = zapDetalle.length > 0 ? zapDetalle.join('\\n\\n') : '✅ Sin alertas relevantes';\nconst nucSeccion = nucDetalle.length > 0 ? nucDetalle.join('\\n\\n') : (nucleiErr ? '⚠️ Nuclei no disponible' : '✅ Sin findings relevantes');\n\nconst msg =\n`🛡️ *PIRINEUS CYBER-MONITOR* 🛡️\n══════════════════════════════\n🎯 *TARGET:* JuiceShop (${target})\n📅 *INICIO:* ${startedAt}\n📅 *FIN:* ${new Date().toLocaleString('es-ES',{timeZone:'Europe/Madrid'})}\n══════════════════════════════\n\n📊 *RESUMEN EJECUTIVO:*\n💀 Críticas: ${totalCrit}   🔴 Altas: ${totalHigh}\n🟡 Medias: ${totalMed}   🔵 Bajas: ${totalLow}\n🚦 *ESTADO:* ${estado}\n\n──────────────────────────────\n🔍 *ZAP — ${alerts.length} alertas (${zapUniq.filter(a=>a.risk!=='Informational').length} únicas relevantes)*\n${zapSeccion}\n\n──────────────────────────────\n🧬 *NUCLEI — ${findings.length} findings*\n${nucSeccion}\n\n──────────────────────────────\n🤖 *ANÁLISIS SOLICITADO AL BOT:*\nPor favor analiza las vulnerabilidades anteriores y para cada una explícame:\n1. ¿Por qué existe esta vulnerabilidad en JuiceShop?\n2. ¿Qué impacto real tendría si fuera explotada?\n3. ¿Cómo se debería remediar de forma concreta?\nSé específico, no genérico. Usa el contexto del target (OWASP JuiceShop) para dar respuestas reales.`;\n\nreturn [{ json: { mensaje: msg } }];"
+      },
+      "id": "build-report",
+      "name": "Construir Informe",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3900, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "const mensaje = $input.first().json.mensaje;\nreturn [{ json: { message: mensaje, deliver: true, channel: 'telegram', to: 'REPLACE_WITH_TELEGRAM_CHAT_ID' } }];"
+      },
+      "id": "serialize",
+      "name": "Serializar Body Telegram",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [4120, 100]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:18789/hooks/agent",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer REPLACE_WITH_OPENCLAW_TOKEN"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "send-openclaw",
+      "name": "Enviar a OpenClaw",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [4340, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "const mensaje = $input.first().json.mensaje;\nreturn [{ json: { message: mensaje, deliver: true, channel: 'telegram', to: 'REPLACE_WITH_TELEGRAM_CHAT_ID' } }];"
+      },
+      "id": "serialize-error",
+      "name": "Serializar Error Telegram",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [4120, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:18789/hooks/agent",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer REPLACE_WITH_OPENCLAW_TOKEN"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "send-error",
+      "name": "Enviar Error a OpenClaw",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [4340, 400]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule 00:00": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "ZAP Nueva Sesion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ZAP Nueva Sesion": {
+      "main": [
+        [
+          {
+            "node": "ZAP Acceder URL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: ZAP Sesión",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: ZAP Sesión": {
+      "main": [
+        [
+          {
+            "node": "Serializar Error Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ZAP Acceder URL": {
+      "main": [
+        [
+          {
+            "node": "ZAP Iniciar Spider",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: ZAP Acceso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: ZAP Acceso": {
+      "main": [
+        [
+          {
+            "node": "Serializar Error Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ZAP Iniciar Spider": {
+      "main": [
+        [
+          {
+            "node": "Guardar Spider ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: ZAP Spider",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: ZAP Spider": {
+      "main": [
+        [
+          {
+            "node": "Serializar Error Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Spider ID": {
+      "main": [
+        [
+          {
+            "node": "Espera Spider",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Espera Spider": {
+      "main": [
+        [
+          {
+            "node": "ZAP Estado Spider",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ZAP Estado Spider": {
+      "main": [
+        [
+          {
+            "node": "Spider 100%?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: ZAP Estado Spider",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: ZAP Estado Spider": {
+      "main": [
+        [
+          {
+            "node": "Serializar Error Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spider 100%?": {
+      "main": [
+        [
+          {
+            "node": "ZAP Iniciar ActiveScan",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Espera Spider Retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Espera Spider Retry": {
+      "main": [
+        [
+          {
+            "node": "ZAP Estado Spider",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ZAP Iniciar ActiveScan": {
+      "main": [
+        [
+          {
+            "node": "Guardar AScan ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: ZAP ActiveScan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: ZAP ActiveScan": {
+      "main": [
+        [
+          {
+            "node": "Serializar Error Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar AScan ID": {
+      "main": [
+        [
+          {
+            "node": "Espera AScan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Espera AScan": {
+      "main": [
+        [
+          {
+            "node": "ZAP Estado AScan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ZAP Estado AScan": {
+      "main": [
+        [
+          {
+            "node": "AScan 100%?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: ZAP Estado AScan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: ZAP Estado AScan": {
+      "main": [
+        [
+          {
+            "node": "Serializar Error Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AScan 100%?": {
+      "main": [
+        [
+          {
+            "node": "ZAP Obtener Alertas",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Espera AScan Retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Espera AScan Retry": {
+      "main": [
+        [
+          {
+            "node": "ZAP Estado AScan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ZAP Obtener Alertas": {
+      "main": [
+        [
+          {
+            "node": "Guardar Alertas ZAP",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: ZAP Alertas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: ZAP Alertas": {
+      "main": [
+        [
+          {
+            "node": "Serializar Error Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Alertas ZAP": {
+      "main": [
+        [
+          {
+            "node": "Nuclei Scan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nuclei Scan": {
+      "main": [
+        [
+          {
+            "node": "Parsear Nuclei",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: Nuclei (continuar)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: Nuclei (continuar)": {
+      "main": [
+        [
+          {
+            "node": "Construir Informe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear Nuclei": {
+      "main": [
+        [
+          {
+            "node": "Construir Informe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir Informe": {
+      "main": [
+        [
+          {
+            "node": "Serializar Body Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Serializar Body Telegram": {
+      "main": [
+        [
+          {
+            "node": "Enviar a OpenClaw",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Serializar Error Telegram": {
+      "main": [
+        [
+          {
+            "node": "Enviar Error a OpenClaw",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}
