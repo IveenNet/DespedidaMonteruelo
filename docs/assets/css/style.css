@@ -270,6 +270,57 @@ kbd {
 .c-muted { color: #6e7681; }
 .c-accent { color: var(--accent); }
 
+/* Copy buttons (reusable) */
+.copy-btn {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,255,136,0.25);
+  background: rgba(0,255,136,0.08);
+  color: var(--accent);
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, background 0.15s, color 0.15s;
+  user-select: none;
+}
+.copy-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0,255,136,0.45);
+  background: rgba(0,255,136,0.12);
+}
+.copy-btn:active { transform: translateY(0); }
+.copy-btn.is-copied {
+  border-color: rgba(0,207,255,0.35);
+  background: rgba(0,207,255,0.1);
+  color: var(--accent2);
+}
+
+.copy-mini {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,255,136,0.18);
+  background: rgba(0,255,136,0.06);
+  color: rgba(230,237,243,0.9);
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, background 0.15s;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.copy-mini:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0,255,136,0.35);
+  background: rgba(0,255,136,0.1);
+}
+.copy-mini.is-copied {
+  border-color: rgba(0,207,255,0.35);
+  background: rgba(0,207,255,0.1);
+}
+
 /* Table */
 .data-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; animation: fadeUp 0.4s ease both; }
 .data-table th { text-align: left; padding: 10px 16px; background: rgba(0,255,136,0.06); border: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--accent); text-transform: uppercase; }
@@ -326,7 +377,6 @@ h3 { font-size: 14px; font-weight: 600; color: var(--accent2); margin: 24px 0 12
 .slide.active .step:nth-child(2) { animation-delay: 0.1s; }
 .slide.active .step:nth-child(3) { animation-delay: 0.15s; }
 .slide.active .step:nth-child(4) { animation-delay: 0.2s; }
-
 /* ─── Responsive: tablets y móviles ───────────────────────────────────────── */
 @media (max-width: 1024px) {
   .slide { padding: 32px 40px; }
