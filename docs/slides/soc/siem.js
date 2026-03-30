@@ -1,5 +1,5 @@
 export default {
-  sectionLabel: null,
+  sectionLabel: 'SIEM · SOC',
   icon:  '🛡️',
   title: 'SIEM · SOC',
   sub:   'Wazuh',

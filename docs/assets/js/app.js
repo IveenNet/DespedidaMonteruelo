@@ -11,6 +11,41 @@ const btnNext    = document.getElementById('btnNext');
 
 let current = 0;
 
+function copyText(text) {
+  if (!text) return Promise.resolve(false);
+  if (navigator.clipboard?.writeText) {
+    return navigator.clipboard.writeText(text).then(() => true).catch(() => false);
+  }
+
+  // Fallback (older browsers / non-secure contexts)
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    ta.style.top = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return Promise.resolve(!!ok);
+  } catch {
+    return Promise.resolve(false);
+  }
+}
+
+function setCopyFeedback(btn, ok) {
+  if (!btn) return;
+  const prev = btn.textContent;
+  btn.classList.toggle('is-copied', !!ok);
+  btn.textContent = ok ? 'Copiado' : 'Error';
+  window.setTimeout(() => {
+    btn.classList.remove('is-copied');
+    btn.textContent = prev;
+  }, 1200);
+}
+
 function buildUI() {
   totalEl.textContent = slides.length;
 
@@ -77,6 +112,24 @@ function goTo(idx) {
 }
 
 window.navigate = (dir) => goTo(current + dir);
+
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-copy], [data-copy-target]');
+  if (!btn) return;
+  const targetId = btn.getAttribute('data-copy-target');
+  let text = '';
+  if (targetId) {
+    const el = document.getElementById(targetId);
+    if (el) {
+      if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') text = el.value || '';
+      else text = el.textContent || '';
+    }
+  } else {
+    text = btn.getAttribute('data-copy') || '';
+  }
+  const ok = await copyText(text);
+  setCopyFeedback(btn, ok);
+});
 
 document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1);
