@@ -1,68 +1,72 @@
 # Informe Ejecutivo de Análisis de Vulnerabilidades en DVWA
 
 ## Resumen ejecutivo
-El análisis realizado sobre DVWA ha identificado un volumen relevante de debilidades de seguridad que, aunque no incluyen hallazgos clasificados como críticos en el último escaneo disponible, sí muestran una exposición sostenida a riesgos de nivel medio y bajo. Destacan especialmente configuraciones inseguras relacionadas con el acceso desde otros dominios y la ausencia de políticas de protección del contenido, junto con una elevada exposición de información técnica en las respuestas de la aplicación.
+El análisis realizado sobre DVWA muestra varias debilidades de seguridad relevantes que, desde una perspectiva de negocio, podrían facilitar incidentes con impacto sobre la confidencialidad de la información, la confianza en la aplicación y la imagen del proyecto. Aunque se trata de un entorno de pruebas, los resultados reflejan situaciones que, en un contexto real, aumentarían la exposición frente a ataques web comunes y a la explotación de configuraciones inseguras.
 
-Desde una perspectiva de negocio, esta situación incrementa la probabilidad de accesos no deseados a información, abuso de funcionalidades web, deterioro de la confianza en el servicio y mayores dificultades para justificar un nivel adecuado de control ante auditorías o revisiones de seguridad.
+Los hallazgos observados apuntan principalmente a carencias en cabeceras de seguridad, exposición innecesaria de información del servidor y controles insuficientes sobre parámetros y cookies. En conjunto, esto dibuja una postura de seguridad débil, con capacidad limitada para prevenir ataques del lado del navegador y para reducir la información útil disponible para un posible atacante.
 
 ## Alcance y objetivo
-El análisis se ha centrado en la aplicación DVWA expuesta en el entorno de laboratorio y evaluada mediante escaneo automatizado de vulnerabilidades web. El objetivo ha sido identificar debilidades de seguridad observables desde la superficie web de la aplicación para valorar su impacto potencial sobre el negocio y priorizar acciones de mitigación.
+El análisis se ha centrado en la aplicación DVWA con el objetivo de identificar vulnerabilidades visibles desde su superficie web y traducir sus implicaciones a un lenguaje comprensible para dirección y responsables del proyecto.
 
-La información utilizada en este informe procede de los resultados ya recibidos durante los análisis previos sobre DVWA, especialmente del último conjunto de alertas generado por el escáner web.
+Este informe se basa en la información ya recibida previamente sobre el análisis de vulnerabilidades en DVWA. En concreto, toma como referencia los hallazgos comunicados sobre cabeceras ausentes, exposición de información del servidor, debilidades en cookies y manipulación de parámetros.
 
 ## Principales riesgos identificados
-### Riesgo medio
-- **Configuración insegura de acceso entre dominios (Cross-Domain Misconfiguration):** se han detectado numerosos casos en los que la aplicación permite políticas demasiado permisivas de acceso desde otros orígenes. Para el negocio, esto puede traducirse en una mayor exposición de información o funcionalidades a sitios de terceros no autorizados.
-- **Ausencia de cabecera Content Security Policy (CSP):** la falta de esta política reduce la capacidad preventiva del navegador frente a contenidos no confiables. En términos de negocio, aumenta el riesgo de compromiso de sesiones, pérdida de confianza del usuario y posible impacto reputacional.
-- **Definición incompleta de directivas CSP:** aunque con menor frecuencia, también se ha observado una configuración incompleta de esta política. Esto debilita la efectividad de los controles esperados y deja márgenes de exposición innecesarios.
+### Riesgo alto para la confianza y la exposición operativa
+- **Manipulación de parámetros (Parameter Tampering):** la aplicación presenta debilidades en la validación o control de parámetros de entrada. Para el negocio, esto supone riesgo de alteración no autorizada del comportamiento esperado, errores de lógica y posible exposición indebida de información.
 
-### Riesgo bajo
-- **Divulgación de marcas temporales del sistema (Timestamp Disclosure - Unix):** se ha detectado una presencia masiva de información temporal expuesta. Aunque por sí sola no implica una intrusión, sí facilita la obtención de contexto técnico por parte de un atacante y contribuye a un perfil de exposición más amplio.
+### Riesgo medio para confidencialidad, integridad y reputación
+- **Ausencia de Content Security Policy (CSP):** al no existir una política que limite qué contenidos pueden ejecutarse en el navegador, aumenta la exposición frente a ataques de inyección y ejecución de contenido malicioso. Esto puede traducirse en compromiso de sesiones, pérdida de confianza del usuario y daño reputacional.
+- **Ausencia de protección anti-clickjacking:** la falta de mecanismos para impedir la carga embebida de la aplicación en sitios de terceros puede facilitar acciones engañosas sobre usuarios legítimos. El impacto se relaciona con fraude, suplantación de interacción y pérdida de control sobre la experiencia del usuario.
+- **Cookies sin atributo SameSite:** esta carencia incrementa el riesgo de ataques en los que un usuario realiza acciones no deseadas desde otro sitio web. A nivel de negocio, puede afectar a la integridad de las operaciones y a la protección de sesiones.
+- **Ausencia de X-Content-Type-Options:** la falta de esta cabecera reduce la protección frente a interpretaciones inseguras del contenido por parte del navegador. Esto aumenta la superficie de explotación en escenarios de carga o tratamiento indebido de contenidos.
 
-### Riesgo informativo
-- **Identificación de aplicación web moderna:** esta clasificación confirma características técnicas de la aplicación y puede facilitar el reconocimiento del entorno por parte de terceros.
-- **Actividad de fuzzing de agente de usuario:** se han registrado elementos informativos relacionados con pruebas automatizadas. Aunque no representan un impacto directo, ayudan a contextualizar la superficie de exposición observada.
+### Riesgo medio-bajo por exposición de información
+- **Fuga de información en banners y respuestas de página:** se ha detectado exposición de información de versión y detalles internos en la propia aplicación.
+- **Divulgación de versión mediante cabecera `Server`:** esta información puede ayudar a perfilar el entorno tecnológico y ajustar ataques a componentes concretos.
+- **Divulgación mediante cabecera `X-Powered-By`:** expone tecnologías o plataformas utilizadas, facilitando el reconocimiento del entorno.
+
+Aunque estos hallazgos no implican por sí solos una intrusión, sí reducen la capacidad defensiva y facilitan que otras debilidades sean explotadas con más eficacia.
 
 ## Impacto potencial
-Si estas debilidades no se corrigen, la organización podría enfrentarse a escenarios como los siguientes:
-- Acceso indebido a información expuesta a través de configuraciones demasiado abiertas entre dominios.
-- Mayor probabilidad de incidentes relacionados con la ejecución de contenido no confiable en el navegador del usuario.
-- Incremento del riesgo reputacional en caso de explotación visible de la aplicación o de compromiso de sesiones.
-- Dificultades para demostrar madurez en seguridad ante auditorías, revisiones académicas o presentaciones del proyecto.
-- Mayor facilidad para que un tercero construya un reconocimiento técnico de la aplicación y encadene debilidades menores en incidentes de mayor impacto.
+Si estas debilidades se mantuvieran en un entorno con datos reales o usuarios reales, podrían materializarse escenarios como:
+- Uso indebido de sesiones o acciones realizadas sin intención del usuario.
+- Pérdida de confianza por incidentes visibles relacionados con manipulación del navegador o comportamiento inesperado de la aplicación.
+- Mayor probabilidad de ataques dirigidos gracias a la información técnica expuesta por el servidor y la aplicación.
+- Aumento del esfuerzo de respuesta ante incidentes y mayor coste de remediación por falta de controles preventivos básicos.
+- Riesgos reputacionales y de cumplimiento si se interpreta que no se han aplicado medidas mínimas de endurecimiento sobre una aplicación web.
 
 ## Recomendaciones prioritarias
-1. **Restringir la política de acceso entre dominios**  
+1. **Reforzar los controles de validación de parámetros**  
    - **Prioridad:** Alta  
-   - **Plazo:** Corto plazo  
-   - **Responsable tipo:** Equipo de desarrollo / IT  
-   - **Acción propuesta:** limitar explícitamente qué orígenes pueden interactuar con la aplicación y eliminar configuraciones abiertas por defecto.
-
-2. **Implantar una política de seguridad de contenidos (CSP) adecuada**  
-   - **Prioridad:** Alta  
-   - **Plazo:** Corto plazo  
-   - **Responsable tipo:** Equipo de desarrollo / Seguridad  
-   - **Acción propuesta:** definir una política de contenido alineada con los recursos legítimos de la aplicación y revisar su cobertura para evitar directivas incompletas.
-
-3. **Reducir la exposición de información técnica innecesaria**  
-   - **Prioridad:** Media  
    - **Plazo:** Corto plazo  
    - **Responsable tipo:** Equipo de desarrollo  
-   - **Acción propuesta:** minimizar la información temporal y otros metadatos visibles que no aportan valor al usuario final.
+   - **Acción propuesta:** revisar la lógica de tratamiento de entradas para asegurar que los parámetros solo admiten valores válidos y esperados.
 
-4. **Establecer una revisión periódica de configuración segura**  
+2. **Implantar cabeceras de seguridad esenciales**  
+   - **Prioridad:** Alta  
+   - **Plazo:** Corto plazo  
+   - **Responsable tipo:** Desarrollo / IT  
+   - **Acción propuesta:** incorporar políticas de seguridad de contenido, protección anti-clickjacking y medidas de endurecimiento del tratamiento de contenido en navegador.
+
+3. **Endurecer la gestión de cookies**  
+   - **Prioridad:** Alta  
+   - **Plazo:** Corto plazo  
+   - **Responsable tipo:** Desarrollo  
+   - **Acción propuesta:** configurar atributos de seguridad adecuados en las cookies para reducir riesgos asociados a sesiones y peticiones cruzadas.
+
+4. **Reducir la exposición de información técnica**  
+   - **Prioridad:** Media  
+   - **Plazo:** Corto plazo  
+   - **Responsable tipo:** IT / Desarrollo  
+   - **Acción propuesta:** eliminar o minimizar banners, cabeceras y referencias de versión que no aporten valor al usuario final.
+
+5. **Establecer una revisión periódica de configuración segura**  
    - **Prioridad:** Media  
    - **Plazo:** Medio plazo  
-   - **Responsable tipo:** Seguridad / IT  
-   - **Acción propuesta:** incorporar validaciones recurrentes sobre cabeceras, exposición de información y endurecimiento de la superficie web.
-
-5. **Formalizar seguimiento ejecutivo del riesgo**  
-   - **Prioridad:** Media  
-   - **Plazo:** Medio plazo  
-   - **Responsable tipo:** Dirección del proyecto / Seguridad  
-   - **Acción propuesta:** convertir los resultados técnicos en un cuadro de seguimiento simple con estado, criticidad y responsables para asegurar cierre efectivo de hallazgos.
+   - **Responsable tipo:** Seguridad / Dirección técnica  
+   - **Acción propuesta:** convertir estas comprobaciones en una revisión recurrente para asegurar que los controles básicos de seguridad permanecen activos.
 
 ## Conclusiones
-El nivel de riesgo global observado para DVWA debe considerarse **moderado**, con un volumen significativo de debilidades que no son críticas de forma aislada, pero que sí reflejan una postura de seguridad mejorable. La prioridad inmediata debe centrarse en corregir las configuraciones inseguras más repetidas y reducir la exposición innecesaria de información técnica.
+La situación observada en DVWA refleja una aplicación con múltiples debilidades de endurecimiento y protección básica. El riesgo global debe considerarse **significativo en términos de exposición**, especialmente por la combinación de controles ausentes, información técnica visible y debilidades en la gestión de entradas y cookies.
 
-Como siguiente paso, se recomienda abordar primero las medidas de corto plazo relacionadas con políticas de acceso y protección del contenido, y posteriormente consolidar un ciclo periódico de revisión para evitar la reaparición de estos hallazgos.
+Para dirección, el mensaje es claro: antes de considerar aceptable una aplicación web en un entorno con usuarios reales, deben implantarse primero controles básicos de protección del navegador, endurecimiento de la configuración y reducción de exposición técnica. El siguiente paso recomendado es corregir estas medidas prioritarias y mantener un seguimiento periódico orientado a cierre efectivo de hallazgos.
