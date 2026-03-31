@@ -9,6 +9,16 @@
   --n8n-label: #9b96b5;
 }
 
+:root[data-theme="light"] .secops-workflows {
+  --n8n-canvas: rgba(255, 255, 255, 0.78);
+  --n8n-node: rgba(255, 255, 255, 0.86);
+  --n8n-border: rgba(99, 102, 241, 0.28);
+  --n8n-accent: var(--accent3);
+  --n8n-accent-soft: rgba(219, 39, 119, 0.10);
+  --n8n-wire: rgba(99, 102, 241, 0.35);
+  --n8n-label: rgba(2, 6, 23, 0.65);
+}
+
 .secops-workflows .n8n-chrome {
   display: flex;
   align-items: center;
@@ -18,9 +28,9 @@
   margin: 8px 0 20px;
   padding: 10px 14px;
   border-radius: 10px;
-  background: linear-gradient(180deg, #1a1625 0%, #14121c 100%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  font-family: 'JetBrains Mono', monospace;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-1) 92%, transparent) 0%, color-mix(in srgb, var(--bg-2) 92%, transparent) 100%);
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
   font-size: 11px;
   color: var(--n8n-label);
   animation: fadeUp 0.45s ease both;
@@ -33,7 +43,7 @@
 .secops-workflows .n8n-logo {
   font-weight: 800;
   letter-spacing: -0.5px;
-  color: #f7f4ff;
+  color: var(--text);
 }
 .secops-workflows .n8n-logo span {
   color: var(--n8n-accent);
@@ -41,8 +51,8 @@
 .secops-workflows .n8n-pill {
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--bg-soft) 60%, transparent);
+  border: 1px solid var(--border);
 }
 .secops-workflows .n8n-pill--hot {
   border-color: var(--n8n-border);
@@ -65,7 +75,7 @@
   text-decoration: none;
   color: inherit;
   background: var(--n8n-canvas);
-  border: 1px solid rgba(163, 155, 255, 0.15);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, rgba(99, 102, 241, 0.12));
   transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
   animation: fadeUp 0.5s ease both;
   position: relative;

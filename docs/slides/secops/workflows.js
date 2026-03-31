@@ -11,6 +11,12 @@ export default {
       <div class="slide-heading">Workflows n8n <span class="badge badge-done">PIRINEUS</span></div>
       <div class="slide-sub">Dos flujos gemelos en <code>server-pirineus</code>: mismo cableado (ZAP + Nuclei + informe + OpenClaw), distinto <code>target</code>. Aquí tienes el <strong>export JSON</strong> listo para importar y un mapa tipo editor n8n.</div>
 
+      <div class="slide-actions">
+        <button class="btn btn--inline" type="button" data-open-modal="implGuide">Abrir guía de implementación</button>
+        <a class="btn btn--ghost" href="assets/downloads/n8n/pirineus-dvwa-full-scan.json" download="pirineus-dvwa-full-scan.json">Descargar DVWA</a>
+        <a class="btn btn--ghost" href="assets/downloads/n8n/pirineus-juiceshop-full-scan.json" download="pirineus-juiceshop-full-scan.json">Descargar Juice Shop</a>
+      </div>
+
       <div class="n8n-chrome">
         <div class="n8n-chrome-left">
           <span class="n8n-logo">n8<span>n</span></span>

@@ -11,6 +11,11 @@ export default {
       <div class="slide-heading">VM-Scanner <span class="badge badge-done">completado</span></div>
       <div class="slide-sub"><code>vm-scanner/</code> contiene <code>docker-compose.yml</code>, <code>.env</code> y el wrapper <code>nuclei-api.py</code>. La idea: red interna (<code>secops-net</code>) + servicios listos para orquestación desde n8n.</div>
 
+      <div class="slide-actions">
+        <button class="btn btn--inline" type="button" data-open-modal="implGuide">Abrir guía de implementación</button>
+        <a class="btn btn--ghost" href="assets/downloads/vm-scanner/docker-compose.yml" download="docker-compose.yml">Descargar compose</a>
+      </div>
+
       <!-- Topología / estado (animado) -->
       <div class="secops-topology">
         <div class="topology-title">

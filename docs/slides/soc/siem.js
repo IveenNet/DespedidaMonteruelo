@@ -3,12 +3,16 @@ export default {
   icon:  '🛡️',
   title: 'SIEM · SOC',
   sub:   'Wazuh',
-  dots:  [false, false],
+  dots:  [true, false, false],
 
   content: `
     <div class="slide-eyebrow">Issue #7 · SIEM</div>
     <div class="slide-heading">Wazuh<span class="badge badge-todo">pendiente</span></div>
-    <div class="slide-sub">Wazuh recibe los eventos de seguridad y los correlaciona. Wazuh Dashboard presenta las alertas clasificadas por nivel de riesgo.</div>
+    <div class="slide-sub">Capa SOC futura: correlación y dashboard. El objetivo es que el pipeline no termine en “logs”, sino en alertas clasificadas y accionables.</div>
+
+    <div class="slide-actions">
+      <button class="btn btn--inline" type="button" data-open-modal="implGuide">Abrir guía de implementación</button>
+    </div>
 
     <div class="cards">
       <div class="card">
@@ -35,22 +39,35 @@ export default {
       <strong>Próximo paso:</strong> Desplegar Wazuh en Docker. Crear regla de alerta que dispare al SOC cuando ZAP detecte vulnerabilidad de nivel medio o grave vía API Elastic.
     </div>
 
-    <h3>// comandos_instalacion_wazuh.sh</h3>
-    <div class="code-block">
-      <div class="code-header">
-        <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
-        <span class="code-label">terminal - VM 2 (SOC)</span>
+    <details class="accordion">
+      <summary>
+        <span class="acc-left">
+          <span class="acc-ico">🧰</span>
+          <span>
+            <span class="acc-title">Comandos de instalación (referencia)</span><br/>
+            <span class="acc-sub">mantenerlo plegado para no saturar la slide</span>
+          </span>
+        </span>
+        <span class="acc-cta">ver</span>
+      </summary>
+      <div class="acc-body">
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+            <span class="code-label">terminal - VM 2 (SOC)</span>
+          </div>
+          <div class="code-body"><span class="c-muted"># 1) Clonar el stack oficial (compose real)</span>
+<span class="c-cyan">git</span> <span class="c-yellow">clone</span> <span class="c-green">https://github.com/wazuh/wazuh-docker.git -b v4.9.0</span>
+<span class="c-cyan">cd</span> <span class="c-green">wazuh-docker/single-node</span>
+
+<span class="c-muted"># 2) Certificados TLS (obligatorio)</span>
+<span class="c-cyan">docker</span> <span class="c-yellow">compose</span> <span class="c-green">-f generate-indexer-certs.yml run --rm generator</span>
+
+<span class="c-muted"># 3) Levantar servicios</span>
+<span class="c-cyan">docker</span> <span class="c-yellow">compose</span> <span class="c-green">up -d</span></div>
+        </div>
       </div>
-      <div class="code-body"><span class="c-muted"># 1. Te descargas la carpeta oficial que ya trae el compose real</span>
-  <span class="c-cyan">git</span> <span class="c-yellow">clone</span> <span class="c-green">https://github.com/wazuh/wazuh-docker.git -b v4.9.0</span>
-  <span class="c-cyan">cd</span> <span class="c-green">wazuh-docker/single-node</span>
-
-  <span class="c-muted"># 2. Ejecutas el script que crea los certificados TLS obligatorios</span>
-  <span class="c-cyan">docker</span> <span class="c-yellow">compose</span> <span class="c-green">-f generate-indexer-certs.yml run --rm generator</span>
-
-  <span class="c-muted"># 3. Levantas el chiringuito (Indexer, Manager y Dashboard)</span>
-  <span class="c-cyan">docker</span> <span class="c-yellow">compose</span> <span class="c-green">up -d</span></div>
-    </div>
+    </details>
 
     <h3>// instalación SOC paso a paso</h3>
     <div class="steps">
