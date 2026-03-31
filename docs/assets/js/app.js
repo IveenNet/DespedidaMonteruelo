@@ -69,13 +69,21 @@ function buildUI() {
     const item = document.createElement('div');
     item.className = 'nav-item' + (i === 0 ? ' active' : '');
     item.dataset.slide = i;
+    const dots = Array.isArray(slide.dots) ? slide.dots : [];
+    const totalDots = dots.length || 3;
+    const filledDots = dots.filter(Boolean).length;
+    const pct = Math.round((filledDots / totalDots) * 100);
     item.innerHTML = `
       <span class="nav-icon">${slide.icon}</span>
       <div class="nav-text">
         <div class="nav-text-title">${slide.title}</div>
         <div class="nav-text-sub">${slide.sub}</div>
       </div>
-      <div class="nav-dots">${slide.dots.map(f => `<div class="dot${f ? ' filled' : ''}"></div>`).join('')}</div>
+      <div class="nav-meter" aria-hidden="true" title="${filledDots}/${totalDots}">
+        <div class="nav-meter-track">
+          <div class="nav-meter-fill" style="width:${pct}%"></div>
+        </div>
+      </div>
     `;
     item.addEventListener('click', () => {
       goTo(i);
@@ -134,6 +142,86 @@ document.addEventListener('click', async (e) => {
 document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1);
   if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goTo(current - 1);
+});
+
+// ─── Modal: guía de implementación ──────────────────────────────────────────
+const guideBtn = document.getElementById('implGuideBtn');
+const guideModal = document.getElementById('implGuide');
+const themeToggle = document.getElementById('themeToggle');
+
+// ─── Theme (light/dark) ─────────────────────────────────────────────────────
+function applyTheme(theme) {
+  const t = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  try { localStorage.setItem('theme', t); } catch {}
+  if (themeToggle) {
+    themeToggle.setAttribute('aria-pressed', t === 'light' ? 'true' : 'false');
+    themeToggle.title = t === 'light' ? 'Tema: claro' : 'Tema: oscuro';
+  }
+}
+
+function getPreferredTheme() {
+  try {
+    const stored = localStorage.getItem('theme');
+    if (stored === 'light' || stored === 'dark') return stored;
+  } catch {}
+  return window.matchMedia?.('(prefers-color-scheme: light)')?.matches ? 'light' : 'dark';
+}
+
+applyTheme(getPreferredTheme());
+
+themeToggle?.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+});
+
+function openModal(modal) {
+  if (!modal) return;
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('modal-open');
+  // focus first close button if present
+  const closeBtn = modal.querySelector('[data-modal-close]');
+  closeBtn?.focus?.();
+}
+
+function closeModal(modal) {
+  if (!modal) return;
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('modal-open');
+}
+
+guideBtn?.addEventListener('click', () => openModal(guideModal));
+
+document.addEventListener('click', (e) => {
+  const closer = e.target.closest?.('[data-modal-close]');
+  if (!closer) return;
+  const id = closer.getAttribute('data-modal-close');
+  const modal = id ? document.getElementById(id) : null;
+  closeModal(modal);
+  guideBtn?.focus?.();
+});
+
+document.addEventListener('click', (e) => {
+  const opener = e.target.closest?.('[data-open-modal]');
+  if (!opener) return;
+  const id = opener.getAttribute('data-open-modal');
+  const modal = id ? document.getElementById(id) : null;
+  openModal(modal);
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === '?') {
+    // avoid stealing focus while typing in inputs
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+    openModal(guideModal);
+  }
+  if (e.key === 'Escape') {
+    if (guideModal?.getAttribute('aria-hidden') === 'false') {
+      closeModal(guideModal);
+      guideBtn?.focus?.();
+    }
+  }
 });
 
 // ─── Sidebar mobile toggle ──────────────────────────────────────────────────

@@ -11,6 +11,11 @@ export default {
       <div class="slide-heading">Targets <span class="badge badge-done">completado</span></div>
       <div class="slide-sub">VM-Targets con Juice Shop y DVWA desplegados en Docker como aplicaciones vulnerables objetivo del escaneo automatizado.</div>
 
+      <div class="slide-actions">
+        <button class="btn btn--inline" type="button" data-open-modal="implGuide">Abrir guía de implementación</button>
+        <a class="btn btn--ghost" href="assets/downloads/vm-web/docker-compose.yml" download="docker-compose.yml">Descargar compose</a>
+      </div>
+
       <!-- Topología / estado (animado) -->
       <div class="targets-topology">
         <div class="topology-title">

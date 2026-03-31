@@ -2,14 +2,19 @@ export default {
   sectionLabel: 'Introducción',
   icon:  '🛡️',
   title: 'Visión general',
-  sub:   'arquitectura · objetivos',
-  dots:  [true],
+  sub:   'pipeline · outputs · límites',
+  dots:  [true, true, true],
 
   content: `
     <div class="intro-overview">
       <div class="slide-eyebrow">Proyecto de innovación educativa</div>
       <div class="slide-heading">Análisis de vulnerabilidades <span class="heading-accent">automatizado</span></div>
-      <div class="slide-sub">Sistema continuo para detectar vulnerabilidades en aplicaciones web, orquestar el análisis con IA y alertar al SOC en tiempo real.</div>
+      <div class="slide-sub">Pipeline reproducible para escanear (ZAP/Nuclei), interpretar (OpenClaw) y entregar respuestas accionables (Telegram + repositorio). El agente <strong>no ejecuta escáneres</strong>: opera con webhooks, memoria y allowlist.</div>
+
+
+      <div class="slide-actions">
+        <button class="btn btn--inline" type="button" data-open-modal="implGuide">Abrir guía de implementación</button>
+      </div>
 
       <!-- Pipeline animado -->
       <div class="pipeline">
@@ -40,7 +45,7 @@ export default {
         <div class="pipe-node pipe-openclaw">
           <div class="pipe-icon">🦞</div>
           <div class="pipe-label">OpenClaw</div>
-          <div class="pipe-sub">webhook · IA</div>
+          <div class="pipe-sub">analista · memoria</div>
         </div>
         <div class="pipe-arrow">
           <div class="pipe-flow"></div>
@@ -49,7 +54,13 @@ export default {
         <div class="pipe-node pipe-telegram">
           <div class="pipe-icon">✈️</div>
           <div class="pipe-label">Telegram</div>
-          <div class="pipe-sub">informe SOC</div>
+          <div class="pipe-sub">ChatOps</div>
+        </div>
+        <div class="pipe-connector">+</div>
+        <div class="pipe-node pipe-github">
+          <div class="pipe-icon">🐙</div>
+          <div class="pipe-label">GitHub</div>
+          <div class="pipe-sub">informes · PR</div>
         </div>
       </div>
 
@@ -69,21 +80,27 @@ export default {
         </div>
         <div class="card">
           <div class="card-icon">🦞</div>
-          <div class="card-title">OpenClaw webhook</div>
-          <div class="card-desc">Recibe los hallazgos via webhook, los analiza con IA y construye el informe en español.</div>
+          <div class="card-title">OpenClaw (Pirineus)</div>
+          <div class="card-desc">Interpreta webhooks (n8n/Wazuh), correlaciona señales, usa memoria y devuelve playbooks por Telegram. Threat intel (Shodan/VT) solo cuando lo piden.</div>
           <div class="card-tag">DONE ✓</div>
         </div>
         <div class="card">
           <div class="card-icon">🛡️</div>
           <div class="card-title">Wazuh SIEM</div>
-          <div class="card-desc">Wazuh recibe eventos del agente en DMZ. Dashboard SOC con alertas clasificadas por riesgo.</div>
-          <div class="card-tag">DONE ✓</div>
+          <div class="card-desc">Roadmap SOC: correlación, reglas y dashboard. En las slides aparece como pendiente (integración progresiva).</div>
+          <div class="card-tag card-tag--todo">PENDIENTE</div>
         </div>
         <div class="card">
           <div class="card-icon">✈️</div>
           <div class="card-title">Alertas Telegram</div>
           <div class="card-desc">Informe de seguridad completo con ZAP + Nuclei entregado por Telegram al finalizar cada escaneo.</div>
           <div class="card-tag">DONE ✓</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔐</div>
+          <div class="card-title">Límites y control</div>
+          <div class="card-desc">Approvals/allowlist: el agente es capaz, pero el perímetro lo define el proyecto. Sin inventar resultados, sin tocar host/FS.</div>
+          <div class="card-tag card-tag--guard">GUARDRAILS</div>
         </div>
       </div>
 
@@ -94,9 +111,10 @@ export default {
         <tr><td>OWASP ZAP</td><td>Escáner activo — spider + active scan</td><td><span class="badge badge-done">completado</span></td></tr>
         <tr><td>Nuclei</td><td>Escáner de templates CVE / vulnerabilidades conocidas</td><td><span class="badge badge-done">completado</span></td></tr>
         <tr><td>OpenClaw</td><td>Agente IA — análisis e informe via webhook</td><td><span class="badge badge-done">completado</span></td></tr>
-        <tr><td>Wazuh</td><td>SIEM — correlación de alertas y dashboard SOC</td><td><span class="badge badge-done">completado</span></td></tr>
+        <tr><td>Wazuh</td><td>SIEM — correlación de alertas y dashboard SOC</td><td><span class="badge badge-todo">pendiente</span></td></tr>
         <tr><td>Juice Shop / DVWA</td><td>Aplicaciones objetivo (red DMZ)</td><td><span class="badge badge-done">completado</span></td></tr>
         <tr><td>Telegram Bot</td><td>Notificaciones al equipo SOC</td><td><span class="badge badge-done">completado</span></td></tr>
+        <tr><td>GitHub</td><td>Entrega: informes, PRs y trazabilidad</td><td><span class="badge badge-done">completado</span></td></tr>
       </table>
     </div>
   `
