@@ -88,6 +88,11 @@ export default {
         </div>
       </div>
 
+      <div class="slide-actions">
+        <button class="btn btn--inline" type="button" data-open-modal="implGuide">Abrir guía de implementación</button>
+        <a class="btn btn--ghost" href="https://openclaw.ai/" target="_blank" rel="noopener noreferrer">Docs OpenClaw</a>
+      </div>
+
       <div class="oc-cmd-section">
         <h3 class="oc-cmd-heading"><span class="oc-cmd-hash" aria-hidden="true">//</span> comandos de referencia</h3>
         <p class="oc-cmd-lead">Comandos alineados con el <strong>Quick Start</strong> de <a href="https://openclaw.ai/" target="_blank" rel="noopener noreferrer">openclaw.ai</a> (instalación en tu máquina, no dentro de los contenedores del lab). Después del <code>onboard</code>, en un servidor como PIRINEUS puedes dejar el <strong>gateway</strong> como servicio <code>systemd --user</code> y cerrar con la <strong>allowlist</strong>.</p>
@@ -149,49 +154,25 @@ export default {
         </p>
       </div>
 
-      <h3>// bootstrap · archivos que cargan al arrancar</h3>
-      <p class="oc-matrix-kicker">Contexto estable + tu criterio operativo. El modelo no “adivina” el proyecto: lee estos módulos junto a la sesión.</p>
-      <div class="oc-file-matrix">
-        <div class="oc-file-card">
-          <div class="oc-file-name">AGENTS.md</div>
-          <p>Reglas de trabajo: prioridades SOC, cómo mezclar hallazgos del lab con intel externa y cuándo escalar a PR o a pregunta en Telegram.</p>
+      <h3>// perímetro de ejecución</h3>
+      <p class="oc-matrix-kicker">Esta slide es el <strong>setup del gateway</strong> y del perímetro. El detalle de archivos (rutina + memoria + límites) vive en <strong>Workspace</strong>, para que no haya duplicados.</p>
+      <div class="oc-perimeter">
+        <div class="oc-per-card">
+          <div class="oc-per-top"><span class="oc-per-ico">🛰️</span><span class="oc-per-name">Gateway</span></div>
+          <p>Servicio persistente (<code>systemd --user</code>) que expone el endpoint y mantiene al agente “online” aunque cierres sesión.</p>
         </div>
-        <div class="oc-file-card">
-          <div class="oc-file-name">SOUL.md</div>
-          <p>Personalidad y límites éticos: tono docente, transparencia sobre límites de herramientas (VT/Shodan) y datos del entorno académico.</p>
+        <div class="oc-per-card">
+          <div class="oc-per-top"><span class="oc-per-ico">🧾</span><span class="oc-per-name">Approvals</span></div>
+          <p><strong>Allowlist</strong> de acciones: el agente puede razonar, pero solo ejecuta lo que el proyecto aprueba (Git, Telegram, VT/Shodan…).</p>
         </div>
-        <div class="oc-file-card">
-          <div class="oc-file-name">IDENTITY.md</div>
-          <p>Cómo se presenta el agente al grupo: nombre, rol, emoji; coherente con Telegram y con las respuestas largas del repositorio.</p>
-        </div>
-        <div class="oc-file-card">
-          <div class="oc-file-name">USER.md</div>
-          <p>El humano (equipo, tutores, Europa/Madrid): trato, plazos y expectativas de informe.</p>
-        </div>
-        <div class="oc-file-card">
-          <div class="oc-file-name">TOOLS.md</div>
-          <p>Capacidades reales: webhook n8n, rutas Git para PR, adaptadores Telegram, consultas VT/Shodan dentro de la allowlist; nada fuera de lista.</p>
-        </div>
-        <div class="oc-file-card">
-          <div class="oc-file-name">MEMORY.md</div>
-          <p>Lo que debe persistir entre sesiones: decisiones del reto, convenciones de severidad y estructura de informes en este repo.</p>
-        </div>
-        <div class="oc-file-card">
-          <div class="oc-file-name">memory/*.md</div>
-          <p>Bitácora diaria de ejecuciones y conversaciones; suele leerse hoy y ayer para no perder continuidad.</p>
-        </div>
-        <div class="oc-file-card">
-          <div class="oc-file-name">BOOTSTRAP · BOOT</div>
-          <p>Rutina de aterrizaje: alinear identidad, usuario y herramientas antes de aceptar tareas “serias”.</p>
-        </div>
-        <div class="oc-file-card">
-          <div class="oc-file-name">HEARTBEAT.md</div>
-          <p>Tareas periódicas ligadas a <code>openclaw.json</code>: ordenar memoria, revisar doc del reto o checks silenciosos si lo activáis.</p>
+        <div class="oc-per-card">
+          <div class="oc-per-top"><span class="oc-per-ico">📓</span><span class="oc-per-name">Workspace</span></div>
+          <p>Contrato operativo: memoria, rutinas y plantillas para que el output sea consistente y auditable (ver slide <strong>Workspace</strong>).</p>
         </div>
       </div>
 
       <div class="info-box oc-info-highlight">
-        <strong>Cierre:</strong> OpenClaw es el <strong>cerebro operativo</strong> del stack: piensa con todo el sistema a la vista, no solo con el último POST de n8n. Si el comportamiento no encaja, revisa allowlist y bootstrap antes del modelo.
+        <strong>Cierre:</strong> OpenClaw es el <strong>cerebro operativo</strong> del stack: piensa con todo el sistema a la vista, no solo con el último POST de n8n. Si el comportamiento no encaja, revisa <strong>allowlist</strong> (perímetro) y <strong>Workspace</strong> (contrato).
       </div>
     </div>
   `,

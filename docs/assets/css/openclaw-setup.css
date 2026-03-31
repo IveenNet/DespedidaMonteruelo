@@ -13,6 +13,538 @@
   line-height: 1.55;
 }
 
+/* Slide: OpenClaw alertas — playbooks + consola (usa la misma paleta) */
+.openclaw-alertas {
+  --oc-coral: #ff8a7a;
+  --oc-coral-2: #ff5e62;
+  --oc-mint: #5ee0d0;
+  --oc-violet: #a78bfa;
+  --oc-coral-glow: rgba(255, 138, 122, 0.22);
+  --oc-mint-glow: rgba(94, 224, 208, 0.2);
+}
+
+/* Setup: perímetro de ejecución */
+.openclaw-setup .oc-perimeter {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 12px 0 18px;
+}
+.openclaw-setup .oc-per-card {
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.22);
+  padding: 12px 12px 10px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  animation: fadeUp 0.45s ease 0.06s both;
+}
+.openclaw-setup .oc-per-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(94, 224, 208, 0.28);
+  box-shadow: 0 14px 34px rgba(94, 224, 208, 0.08);
+}
+.openclaw-setup .oc-per-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.openclaw-setup .oc-per-ico { font-size: 16px; }
+.openclaw-setup .oc-per-name { font-weight: 900; color: rgba(230, 237, 243, 0.93); }
+.openclaw-setup .oc-per-card p { margin: 0; color: rgba(230, 237, 243, 0.76); font-size: 12px; line-height: 1.5; }
+@media (max-width: 900px) {
+  .openclaw-setup .oc-perimeter { grid-template-columns: 1fr; }
+}
+.openclaw-alertas .oc-a-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1.35fr;
+  gap: 14px;
+  margin: 16px 0 14px;
+}
+.openclaw-alertas .oc-a-grid--v2 {
+  grid-template-columns: 1fr 1.25fr;
+  align-items: start;
+}
+.openclaw-alertas .oc-a-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+.openclaw-alertas .oc-a-panel {
+  position: relative;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(ellipse 90% 70% at 20% 0%, rgba(167, 139, 250, 0.1) 0%, transparent 55%),
+    radial-gradient(ellipse 90% 70% at 85% 25%, rgba(94, 224, 208, 0.08) 0%, transparent 55%),
+    linear-gradient(165deg, #0c0e16 0%, #080a10 45%, #0b1018 100%);
+  box-shadow:
+    0 0 0 1px rgba(255, 94, 98, 0.05) inset,
+    0 18px 46px rgba(0, 0, 0, 0.42);
+  padding: 14px 14px 12px;
+  overflow: hidden;
+  animation: fadeUp 0.5s ease 0.05s both;
+}
+
+/* Light-theme overrides (OpenClaw slides) */
+:root[data-theme="light"] .openclaw-alertas .oc-a-panel,
+:root[data-theme="light"] .openclaw-ws-panel,
+:root[data-theme="light"] .openclaw-setup .oc-brain-stage,
+:root[data-theme="light"] .openclaw-setup .oc-panel,
+:root[data-theme="light"] .openclaw-setup .code-block.oc-cli-dock,
+:root[data-theme="light"] .openclaw-setup .oc-per-card {
+  border-color: var(--border);
+  background: var(--bg-1) !important;
+  box-shadow: 0 18px 46px rgba(2, 6, 23, 0.08);
+}
+
+:root[data-theme="light"] .openclaw-alertas .oc-a-pill,
+:root[data-theme="light"] .openclaw-alertas .oc-a-mini,
+:root[data-theme="light"] .openclaw-alertas .oc-ti,
+:root[data-theme="light"] .openclaw-ws-box,
+:root[data-theme="light"] .openclaw-ws-node,
+:root[data-theme="light"] .openclaw-setup .oc-sat,
+:root[data-theme="light"] .openclaw-setup .oc-core {
+  background: var(--bg-soft);
+  border-color: var(--border);
+}
+
+:root[data-theme="light"] .openclaw-alertas .oc-a-console .code-body {
+  background: var(--code-bg);
+}
+
+:root[data-theme="light"] .openclaw-setup .oc-cli-body {
+  background: var(--code-bg);
+}
+
+:root[data-theme="light"] .openclaw-setup .oc-cli-chrome {
+  background: var(--bg-2);
+  border-bottom-color: var(--border);
+}
+.openclaw-alertas .oc-a-panel::before {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  background:
+    radial-gradient(circle at 30% 35%, var(--oc-coral-glow) 0%, transparent 42%),
+    radial-gradient(circle at 70% 55%, var(--oc-mint-glow) 0%, transparent 38%);
+  opacity: 0.35;
+  pointer-events: none;
+  animation: ocAuraDrift 14s ease-in-out infinite;
+}
+.openclaw-alertas .oc-a-panel > * { position: relative; z-index: 1; }
+.openclaw-alertas .oc-a-h {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.openclaw-alertas .oc-a-kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(94, 224, 208, 0.75);
+}
+.openclaw-alertas .oc-a-title {
+  font-weight: 800;
+  color: var(--text);
+}
+.openclaw-alertas .oc-a-routine {
+  margin: 0;
+  padding-left: 18px;
+  color: color-mix(in srgb, var(--text) 86%, transparent);
+  line-height: 1.6;
+}
+.openclaw-alertas .oc-a-routine li { margin: 0 0 8px; }
+.openclaw-alertas .oc-a-boundaries { margin-top: 12px; }
+.openclaw-alertas .oc-a-boundaries-h {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(167, 139, 250, 0.85);
+  margin-bottom: 8px;
+}
+.openclaw-alertas .oc-a-boundaries-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.openclaw-alertas .oc-a-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: color-mix(in srgb, var(--text) 82%, transparent);
+  font-size: 11px;
+}
+.openclaw-alertas .oc-a-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.openclaw-alertas .oc-a-mini {
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  padding: 10px 11px;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.openclaw-alertas .oc-a-mini:hover {
+  transform: translateY(-2px);
+  border-color: rgba(94, 224, 208, 0.28);
+  box-shadow: 0 12px 26px rgba(94, 224, 208, 0.08);
+}
+.openclaw-alertas .oc-a-mini-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.openclaw-alertas .oc-a-mini-ico { font-size: 14px; }
+.openclaw-alertas .oc-a-mini-title { font-weight: 800; color: var(--text); }
+.openclaw-alertas .oc-a-mini-title { color: var(--text); }
+.openclaw-alertas .oc-a-mini-desc { font-size: 12px; color: var(--muted); line-height: 1.45; }
+.openclaw-alertas .oc-a-console .code-body {
+  max-height: 340px;
+  overflow: auto;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% -10%, rgba(94, 224, 208, 0.08) 0%, transparent 55%),
+    rgba(5, 8, 14, 0.92);
+  border-radius: 0 0 12px 12px;
+}
+.openclaw-alertas .oc-a-panel--intel { grid-column: 1 / -1; }
+.openclaw-alertas .oc-a-panel--intel {
+  grid-column: auto;
+  padding-bottom: 14px;
+}
+.openclaw-alertas .oc-a-h--intel .oc-a-title {
+  background: linear-gradient(90deg, rgba(94, 224, 208, 0.95), rgba(167, 139, 250, 0.95), rgba(255, 138, 122, 0.95));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Threat intel accordions */
+.openclaw-alertas .oc-ti-stack {
+  display: grid;
+  gap: 10px;
+  margin: 4px 0 12px;
+}
+.openclaw-alertas .oc-ti {
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  overflow: hidden;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.openclaw-alertas .oc-ti:hover {
+  transform: translateY(-2px);
+  border-color: rgba(94, 224, 208, 0.28);
+  box-shadow: 0 14px 34px rgba(94, 224, 208, 0.09);
+}
+.openclaw-alertas .oc-ti[open] {
+  border-color: rgba(94, 224, 208, 0.38);
+  box-shadow: 0 18px 44px rgba(94, 224, 208, 0.12);
+}
+.openclaw-alertas .oc-ti-sum {
+  list-style: none;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 22px auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 12px;
+  user-select: none;
+}
+.openclaw-alertas .oc-ti-sum::-webkit-details-marker { display: none; }
+.openclaw-alertas .oc-ti-ico { font-size: 16px; }
+.openclaw-alertas .oc-ti-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 900;
+  color: rgba(94, 224, 208, 0.95);
+}
+.openclaw-alertas .oc-ti-sub {
+  font-size: 12px;
+  color: var(--muted);
+}
+.openclaw-alertas .oc-ti-cta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.openclaw-alertas .oc-ti-body {
+  padding: 0 12px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  animation: ocTiDrop 0.22s ease both;
+}
+.openclaw-alertas .oc-ti-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0 8px;
+}
+.openclaw-alertas .oc-ti-line { color: var(--muted); }
+.openclaw-alertas .oc-ti-actions { display: flex; gap: 8px; }
+.openclaw-alertas .oc-ti-btn {
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(94, 224, 208, 0.35);
+  background: rgba(94, 224, 208, 0.1);
+  color: rgba(184, 255, 245, 0.95);
+  font-weight: 800;
+  font-size: 12px;
+}
+.openclaw-alertas .oc-ti-btn:hover {
+  border-color: rgba(94, 224, 208, 0.55);
+  background: rgba(94, 224, 208, 0.16);
+}
+.openclaw-alertas .oc-ti-code {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(ellipse 90% 70% at 50% -10%, rgba(94, 224, 208, 0.08) 0%, transparent 55%),
+    rgba(5, 8, 14, 0.92);
+  color: rgba(230, 237, 243, 0.86);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.openclaw-alertas .oc-ti-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: rgba(230, 237, 243, 0.7);
+}
+.openclaw-alertas .oc-ti--shodan .oc-ti-name { color: rgba(255, 138, 122, 0.95); }
+.openclaw-alertas .oc-ti--shodan[open] { border-color: rgba(255, 138, 122, 0.35); box-shadow: 0 18px 44px rgba(255, 94, 98, 0.1); }
+.openclaw-alertas .oc-ti--shodan:hover { border-color: rgba(255, 138, 122, 0.28); box-shadow: 0 14px 34px rgba(255, 94, 98, 0.08); }
+
+@keyframes ocTiDrop {
+  from { opacity: 0; transform: translateY(-6px); filter: blur(2px); }
+  to { opacity: 1; transform: translateY(0); filter: none; }
+}
+.openclaw-alertas .oc-a-cmds {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.openclaw-alertas .oc-a-cmd {
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.22);
+  padding: 10px 11px;
+}
+.openclaw-alertas .oc-a-cmd-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.openclaw-alertas .oc-a-cmd-ico { font-size: 14px; }
+.openclaw-alertas .oc-a-cmd-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  color: rgba(94, 224, 208, 0.95);
+}
+.openclaw-alertas .oc-a-cmd-desc { font-size: 12px; color: rgba(230, 237, 243, 0.78); line-height: 1.45; }
+.openclaw-alertas .oc-a-env-h {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 138, 122, 0.88);
+  margin: 0 0 8px;
+}
+
+@media (max-width: 900px) {
+  .openclaw-alertas .oc-a-grid { grid-template-columns: 1fr; }
+  .openclaw-alertas .oc-a-grid--v2 { grid-template-columns: 1fr; }
+}
+
+/* Slide: OpenClaw workspace — contrato operativo */
+.openclaw-ws {
+  --oc-coral: #ff8a7a;
+  --oc-mint: #5ee0d0;
+  --oc-violet: #a78bfa;
+  margin-top: 14px;
+}
+.openclaw-ws-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: start;
+}
+.openclaw-ws-panel {
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(ellipse 90% 70% at 15% 0%, rgba(167, 139, 250, 0.1) 0%, transparent 55%),
+    radial-gradient(ellipse 90% 70% at 85% 25%, rgba(94, 224, 208, 0.08) 0%, transparent 55%),
+    linear-gradient(165deg, #0c0e16 0%, #080a10 45%, #0b1018 100%);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.38);
+  padding: 14px 14px 12px;
+  animation: fadeUp 0.5s ease 0.04s both;
+}
+.openclaw-ws-panel--wide { grid-column: 1 / -1; }
+.openclaw-ws-h {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.openclaw-ws-k {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(94, 224, 208, 0.75);
+}
+.openclaw-ws-t { font-weight: 900; color: var(--text); }
+.openclaw-ws-t { color: var(--text); }
+.openclaw-ws-list {
+  margin: 0;
+  padding-left: 18px;
+  color: color-mix(in srgb, var(--text) 86%, transparent);
+  line-height: 1.6;
+}
+.openclaw-ws-list li { margin: 0 0 8px; }
+.openclaw-ws-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.openclaw-ws-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 11px;
+}
+.openclaw-ws-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.openclaw-ws-box {
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  padding: 10px 11px;
+}
+.openclaw-ws-box--no { border-color: rgba(255, 138, 122, 0.22); }
+.openclaw-ws-box-h {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(167, 139, 250, 0.85);
+  margin-bottom: 8px;
+}
+.openclaw-ws-box ul { color: var(--muted); }
+.openclaw-ws-out { margin-top: 12px; }
+.openclaw-ws-out-h {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 138, 122, 0.88);
+  margin-bottom: 8px;
+}
+.openclaw-ws-out-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.openclaw-ws-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(94, 224, 208, 0.18);
+  background: rgba(94, 224, 208, 0.08);
+  color: rgba(184, 255, 245, 0.92);
+  font-size: 11px;
+  font-weight: 800;
+}
+.openclaw-ws-panel {
+  position: relative;
+  overflow: hidden;
+}
+.openclaw-ws-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 22px 22px;
+  opacity: 0.04;
+  pointer-events: none;
+}
+.openclaw-ws-panel > * { position: relative; z-index: 1; }
+.openclaw-ws-panel:hover {
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.38), 0 0 0 1px rgba(94, 224, 208, 0.06) inset;
+}
+
+.openclaw-ws-timeline {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 4px;
+}
+.openclaw-ws-node {
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  padding: 10px 11px;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.openclaw-ws-node:hover {
+  transform: translateY(-2px);
+  border-color: rgba(94, 224, 208, 0.22);
+  box-shadow: 0 12px 30px rgba(94, 224, 208, 0.08);
+}
+.openclaw-ws-node-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(94, 224, 208, 1), rgba(167, 139, 250, 1));
+  box-shadow: 0 0 16px rgba(94, 224, 208, 0.22);
+  margin-bottom: 8px;
+}
+.openclaw-ws-node-title { color: var(--text); }
+.openclaw-ws-node-desc { font-size: 12px; color: var(--muted); line-height: 1.45; }
+
+.openclaw-ws-glass {
+  margin-top: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 138, 122, 0.18);
+  background:
+    radial-gradient(ellipse 90% 70% at 30% 0%, rgba(255, 138, 122, 0.14) 0%, transparent 55%),
+    rgba(0, 0, 0, 0.18);
+  padding: 10px 11px;
+}
+.openclaw-ws-glass-k {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 138, 122, 0.88);
+  margin-bottom: 6px;
+}
+.openclaw-ws-glass-t { color: var(--text); }
+
+@media (max-width: 900px) {
+  .openclaw-ws-grid { grid-template-columns: 1fr; }
+  .openclaw-ws-two { grid-template-columns: 1fr; }
+  .openclaw-ws-timeline { grid-template-columns: 1fr; }
+}
+
 /* ─── escenario “cerebro” ─── */
 .openclaw-setup .oc-brain-stage {
   position: relative;

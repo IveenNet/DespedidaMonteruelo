@@ -27,6 +27,13 @@
       <span class="project-name">DespedidaMonteruelo</span>
     </div>
     <div class="topbar-right">
+      <button class="topbar-theme" id="themeToggle" type="button" aria-label="Cambiar tema (claro/oscuro)" title="Tema">
+        <span class="topbar-theme-ico" aria-hidden="true">◐</span>
+        <span class="topbar-theme-label">Tema</span>
+      </button>
+      <button class="topbar-cta" id="implGuideBtn" type="button" aria-haspopup="dialog" aria-controls="implGuide" aria-label="Abrir guía de implementación">
+        Guía <span class="topbar-cta-kbd">?</span>
+      </button>
       <span class="nav-hint"><kbd>←</kbd><kbd>→</kbd> navegar</span>
       <span class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides">-</span></span>
     </div>
@@ -55,6 +62,49 @@
   <div class="bottom-nav">
     <button class="btn-nav" id="btnPrev" onclick="navigate(-1)">←</button>
     <button class="btn-nav" id="btnNext" onclick="navigate(1)">→</button>
+  </div>
+
+  <!-- Implementation Guide Modal -->
+  <div class="modal" id="implGuide" role="dialog" aria-modal="true" aria-labelledby="implGuideTitle" aria-hidden="true">
+    <div class="modal-backdrop" data-modal-close="implGuide" aria-hidden="true"></div>
+    <div class="modal-card" role="document">
+      <div class="modal-head">
+        <div class="modal-title">
+          <div class="modal-kicker">// implementación</div>
+          <div id="implGuideTitle" class="modal-h">Guía rápida (PIRINEUS)</div>
+        </div>
+        <button class="modal-close btn" type="button" data-modal-close="implGuide" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div class="modal-panel">
+            <div class="modal-panel-h">1) Levanta el scanner (Docker)</div>
+            <p>Importa el stack de <strong>vm-scanner</strong> (incluye n8n, ZAP y Nuclei wrapper) y ajusta variables.</p>
+            <div class="modal-links">
+              <a class="modal-link" href="assets/downloads/vm-scanner/docker-compose.yml" download>Descargar <code>docker-compose.yml</code></a>
+              <a class="modal-link" href="assets/downloads/vm-scanner/.env.example" download>Descargar <code>.env.example</code></a>
+            </div>
+          </div>
+          <div class="modal-panel">
+            <div class="modal-panel-h">2) Importa workflows en n8n</div>
+            <p>Workflows gemelos (DVWA / Juice Shop). Tras importar, sustituye <code>REPLACE_WITH_*</code> por secretos/vars reales.</p>
+            <div class="modal-links">
+              <a class="modal-link" href="assets/downloads/n8n/pirineus-dvwa-full-scan.json" download>DVWA workflow</a>
+              <a class="modal-link" href="assets/downloads/n8n/pirineus-juiceshop-full-scan.json" download>Juice Shop workflow</a>
+            </div>
+          </div>
+          <div class="modal-panel">
+            <div class="modal-panel-h">3) Instala OpenClaw + gateway</div>
+            <p>Instala desde <a href="https://openclaw.ai/" target="_blank" rel="noopener noreferrer">openclaw.ai</a>, haz <code>onboard</code> y deja el gateway persistente con <code>systemd --user</code>.</p>
+            <div class="modal-footnote">Los comandos y el perímetro (allowlist) están detallados en la sección OpenClaw de estas slides.</div>
+          </div>
+          <div class="modal-panel">
+            <div class="modal-panel-h">4) Verifica “output”</div>
+            <p>La salida buena es: resumen corto para móvil (Telegram) + trazabilidad en repo (informes/PR). Si falta contexto, revisa Workspace y allowlist.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="assets/js/app.js"></script>
