@@ -43,13 +43,13 @@ def scan():
         *template_args,
         '-u', target,
         '-severity', severity,
-        '-jsonl',
+        '-jsonl',           # ← Nuclei v3 usa -jsonl, no -json
         '-o', output,
         '-timeout', '10',
         '-retries', '1',
         '-bulk-size', '20',
         '-concurrency', '10',
-        '-no-interactsh',
+        '-no-interactsh',   # evitar dependencia externa
     ]
 
     print(f"[nuclei-api] CMD: {' '.join(cmd)}", flush=True)
@@ -86,6 +86,7 @@ def scan():
 
 @app.route('/health', methods=['GET'])
 def health():
+    # Devuelve también info de templates disponibles
     available = [d for d in TEMPLATE_DIRS if os.path.isdir(d)]
     return jsonify({'ok': True, 'templates_available': available})
 
@@ -107,3 +108,4 @@ def list_templates():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+

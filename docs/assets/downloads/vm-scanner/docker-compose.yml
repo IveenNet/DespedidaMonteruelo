@@ -1,5 +1,4 @@
 services:
-
   # ─── OWASP ZAP ─────────────────────────────────────────────
   zap:
     image: ghcr.io/zaproxy/zaproxy:stable
@@ -22,7 +21,11 @@ services:
     networks:
       - secops-net
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8090/JSON/core/view/version/ || exit 1" ]
+      test:
+        [
+          "CMD-SHELL",
+          "curl -f http://localhost:8090/JSON/core/view/version/ || exit 1",
+        ]
       interval: 20s
       timeout: 10s
       retries: 5
@@ -32,7 +35,7 @@ services:
     image: projectdiscovery/nuclei:latest
     container_name: nuclei
     restart: unless-stopped
-    entrypoint: [ "sleep", "infinity" ]
+    entrypoint: ["sleep", "infinity"]
     environment:
       - DMZ_DVWA=${DMZ_DVWA}
       - DMZ_JUICESHOP=${DMZ_JUICESHOP}
@@ -78,7 +81,7 @@ services:
              pip install flask -q --break-system-packages &&
              python3 nuclei-api.py"
     networks:
-      - secops-net # nuclei-api debe estar en secops-net (DNS interno)
+      - secops-net # ← ESTO FALTABA: nuclei-api no estaba en la red
     depends_on:
       - nuclei-updater
 
