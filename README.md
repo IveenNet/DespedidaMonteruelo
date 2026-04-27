@@ -10,10 +10,10 @@
 
 Este proyecto tiene dos partes que conviven en el mismo repo:
 
-1. **Presentación web (GitHub Pages)** — Carpeta [`docs/`](docs/): diapositivas navegables con la arquitectura, el laboratorio SecOps, los flujos **n8n**, la configuración de **[OpenClaw](https://openclaw.ai/)** y el roadmap del SIEM (**Wazuh**). Es HTML, CSS y JavaScript modular, sin framework pesado.
+1. **Presentación web (GitHub Pages)** — Carpeta [`docs/`](docs/): diapositivas navegables con la arquitectura, el laboratorio SecOps, los flujos **n8n**, la configuración de **[OpenClaw](https://openclaw.ai/)** y el SIEM (**Wazuh**: despliegue, agentes y SOAR). Es HTML, CSS y JavaScript modular, sin framework pesado.
 2. **Artefactos del laboratorio** — Plantillas descargables: `docker-compose` para **vm-scanner** y **vm-web**, exportes JSON de workflows n8n, y scripts auxiliares (por ejemplo el wrapper de Nuclei). Sirven para reproducir el entorno **PIRINEUS** descrito en las slides.
 
-La narrativa técnica del laboratorio: **n8n** orquesta escaneos con **OWASP ZAP** y **Nuclei**; el resultado se envía a **OpenClaw** (agente local con gateway, herramientas acotadas por *allowlist* y contexto del *workspace*). Desde ahí se enriquece con fuentes como **VirusTotal** o **Shodan**, se notifica por **Telegram** y se pueden generar **informes en el repositorio** (por ejemplo vía pull requests). **Wazuh** aparece en la presentación como línea evolutiva del SOC (correlación y alertas desde el SIEM), pendiente de despliegue según las slides.
+La narrativa técnica del laboratorio: **n8n** orquesta escaneos con **OWASP ZAP** y **Nuclei**; el resultado se envía a **OpenClaw** (agente local con gateway, herramientas acotadas por *allowlist* y contexto del *workspace*). Desde ahí se enriquece con fuentes como **VirusTotal** o **Shodan**, se notifica por **Telegram** y se pueden generar **informes en el repositorio** (por ejemplo vía pull requests). **Wazuh** centraliza telemetría y alertas del SOC; las alertas de mayor severidad se enlazan con **OpenClaw** (integración SOAR descrita en las slides).
 
 > **Nota sobre el nombre del agente:** en documentación y comunidad el proyecto se alinea con **OpenClaw** (antes conocido como Clawdbot / Moltbot). Donde veas referencias históricas a “Clawbot” en issues o slides antiguas, el rol es el mismo: cerebro del sistema frente a n8n como mero orquestador de escaneos.
 
@@ -47,8 +47,8 @@ flowchart TB
   OC --> GH[GitHub · informes / PRs]
   OC --> ENR[VirusTotal · Shodan · …]
 
-  Wazuh[Wazuh SIEM · roadmap]
-  Wazuh -.->|futuro: correlación SOC| OC
+  Wazuh[Wazuh SIEM · SOC]
+  Wazuh -->|alertas críticas · webhook SOAR| OC
 ```
 
 ---
@@ -68,6 +68,8 @@ Abre la URL que indique la herramienta (suele ser `http://localhost:3000`). Nave
 ### En GitHub Pages
 
 Tras configurar Pages en el repositorio, el sitio publica el contenido de **`docs/`**. En GitHub: **Settings → Pages → Build and deployment** (origen: GitHub Actions o rama `main` con carpeta `/docs` según tu configuración).
+
+URL pública actual: [https://iveennet.github.io/DespedidaMonteruelo/](https://iveennet.github.io/DespedidaMonteruelo/)
 
 El workflow [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) despliega automáticamente cuando hay cambios bajo `docs/**` en la rama `main`.
 
@@ -96,7 +98,7 @@ Orden actual del *deck*:
 6. OpenClaw — setup  
 7. OpenClaw — workspace  
 8. OpenClaw — alertas  
-9. SIEM / SOC — Wazuh (estado en slides)
+9. SIEM / SOC — Wazuh (despliegue y SOAR)
 
 ---
 
@@ -145,7 +147,7 @@ ZAP_API_KEY=tu_clave_zap
 
 - [Documentación OWASP ZAP API](https://www.zaproxy.org/docs/api/)  
 - [VirusTotal API](https://docs.virustotal.com/reference/overview)  
-- [Wazuh](https://documentation.wazuh.com/) (cuando integres el SIEM)
+- [Wazuh](https://documentation.wazuh.com/) — SIEM y agentes (ver slide SIEM en `docs/`)
 
 ---
 
@@ -191,7 +193,7 @@ Más contexto: [Git Flow (nvie)](https://nvie.com/posts/a-successful-git-branchi
 
 - Consolidar **OpenClaw** en el host de confianza (gateway, *approvals*, integración con n8n y Telegram).
 - Mantener exportes **n8n** y la doc del lab al día en `docs/assets/downloads/`.
-- Desplegar **Wazuh** y reglas que enlacen hallazgos del laboratorio con el flujo SOC (ver slide SIEM).
+- Afinar **Wazuh** (reglas, *false positives*, más agentes) según evolucione el laboratorio; la base SIEM + SOAR hacia OpenClaw ya está descrita en la slide SIEM.
 
 ---
 

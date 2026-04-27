@@ -87,8 +87,8 @@ export default {
         <div class="card">
           <div class="card-icon">🛡️</div>
           <div class="card-title">Wazuh SIEM</div>
-          <div class="card-desc">Roadmap SOC: correlación, reglas y dashboard. En las slides aparece como pendiente (integración progresiva).</div>
-          <div class="card-tag card-tag--todo">PENDIENTE</div>
+          <div class="card-desc">SIEM desplegado (Docker): ingesta, reglas, MITRE y SOAR hacia OpenClaw (webhook en alertas críticas) con trazabilidad en Telegram.</div>
+          <div class="card-tag">DONE ✓</div>
         </div>
         <div class="card">
           <div class="card-icon">✈️</div>
@@ -111,7 +111,7 @@ export default {
         <tr><td>OWASP ZAP</td><td>Escáner activo — spider + active scan</td><td><span class="badge badge-done">completado</span></td></tr>
         <tr><td>Nuclei</td><td>Escáner de templates CVE / vulnerabilidades conocidas</td><td><span class="badge badge-done">completado</span></td></tr>
         <tr><td>OpenClaw</td><td>Agente IA — análisis e informe via webhook</td><td><span class="badge badge-done">completado</span></td></tr>
-        <tr><td>Wazuh</td><td>SIEM — correlación de alertas y dashboard SOC</td><td><span class="badge badge-todo">pendiente</span></td></tr>
+        <tr><td>Wazuh</td><td>SIEM — correlación de alertas y dashboard SOC</td><td><span class="badge badge-done">completado</span></td></tr>
         <tr><td>Juice Shop / DVWA</td><td>Aplicaciones objetivo (red DMZ)</td><td><span class="badge badge-done">completado</span></td></tr>
         <tr><td>Telegram Bot</td><td>Notificaciones al equipo SOC</td><td><span class="badge badge-done">completado</span></td></tr>
         <tr><td>GitHub</td><td>Entrega: informes, PRs y trazabilidad</td><td><span class="badge badge-done">completado</span></td></tr>
