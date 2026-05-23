@@ -1,5 +1,5 @@
 services:
-  # ─── OWASP ZAP ─────────────────────────────────────────────
+  # ─── OWASP ZAP ────────────────────────────────────────────────
   zap:
     image: ghcr.io/zaproxy/zaproxy:stable
     container_name: owasp-zap
@@ -7,7 +7,12 @@ services:
     mem_limit: 4g
     mem_reservation: 1g
     command: >
-      zap.sh -daemon -host 0.0.0.0 -port 8090 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true -config api.key=${ZAP_API_KEY} -config api.disablekey=false -config connection.timeoutInSecs=300
+      zap.sh -daemon -host 0.0.0.0 -port 8090
+      -config api.addrs.addr.name=.*
+      -config api.addrs.addr.regex=true
+      -config api.key=${ZAP_API_KEY}
+      -config api.disablekey=false
+      -config connection.timeoutInSecs=300
     ports:
       - "8090:8090"
     environment:
@@ -30,7 +35,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
-  # ─── NUCLEI ────────────────────────────────────────────────
+
+  # ─── NUCLEI (runner bajo demanda) ────────────────────────────
   nuclei:
     image: projectdiscovery/nuclei:latest
     container_name: nuclei
@@ -44,26 +50,44 @@ services:
       - nuclei-reports:/reports
     networks:
       - secops-net
+    depends_on:
+      nuclei-updater:
+        condition: service_healthy
 
-  # ─── NUCLEI TEMPLATE UPDATER (cada 24h) ────────────────────
+  # ─── NUCLEI TEMPLATE UPDATER (cada 24h) ──────────────────────
+  # El bucle: intenta actualizar, espera 1h si falla, 24h si OK.
+  # restart: on-failure evita reinicios infinitos ante errores graves.
   nuclei-updater:
     image: projectdiscovery/nuclei:latest
     container_name: nuclei-updater
-    restart: unless-stopped
+    restart: on-failure
     entrypoint: >
-      sh -c "while true; do
-        nuclei -update-templates -ud /root/nuclei-templates &&
-        echo \"[updater] Templates OK\" >> /root/nuclei-templates/update.log 2>&1;
-        sleep 86400;
-      done"
+      sh -c "
+        while true; do
+          if nuclei -update-templates -ud /root/nuclei-templates; then
+            echo \"[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Templates actualizados OK\" >> /root/nuclei-templates/update.log;
+            sleep 86400;
+          else
+            echo \"[$(date -u +%Y-%m-%dT%H:%M:%SZ)] ERROR al actualizar templates, reintentando en 1h\" >> /root/nuclei-templates/update.log;
+            sleep 3600;
+          fi
+        done"
     volumes:
       - nuclei-templates:/root/nuclei-templates
     networks:
       - secops-net
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /root/nuclei-templates/update.log || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
 
-  # ─── NUCLEI API WRAPPER ────────────────────────────────────
+  # ─── NUCLEI API WRAPPER ───────────────────────────────────────
   nuclei-api:
-    image: projectdiscovery/nuclei:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.nuclei-api
     container_name: nuclei-api
     restart: unless-stopped
     ports:
@@ -76,16 +100,13 @@ services:
       - nuclei-reports:/reports
       - ./nuclei-api.py:/app/nuclei-api.py
     working_dir: /app
-    entrypoint: >
-      sh -c "apk add python3 py3-pip -q &&
-             pip install flask -q --break-system-packages &&
-             python3 nuclei-api.py"
     networks:
-      - secops-net # ← ESTO FALTABA: nuclei-api no estaba en la red
+      - secops-net
     depends_on:
-      - nuclei-updater
+      nuclei-updater:
+        condition: service_healthy
 
-  # ─── N8N ───────────────────────────────────────────────────
+  # ─── N8N ──────────────────────────────────────────────────────
   n8n:
     image: n8nio/n8n:latest
     container_name: n8n
@@ -98,9 +119,10 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       - WEBHOOK_URL=http://${SECOPS_IP}:5678
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=${N8N_USER}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
+      - N8N_BASIC_AUTH_ACTIVE=false
+      - N8N_USER_MANAGEMENT_JWT_SECRET=${N8N_JWT_SECRET}
+      - N8N_DEFAULT_USER_EMAIL=${N8N_USER}
+      - N8N_DEFAULT_USER_PASSWORD=${N8N_PASSWORD}
       - N8N_LOG_LEVEL=info
       - N8N_COMMUNITY_PACKAGES_ENABLED=true
       - N8N_SECURE_COOKIE=false
@@ -119,11 +141,12 @@ services:
     networks:
       - secops-net
     depends_on:
-      - zap
+      zap:
+        condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-# ─── VOLÚMENES ─────────────────────────────────────────────
+# ─── VOLÚMENES ────────────────────────────────────────────────
 volumes:
   zap-data:
   zap-reports:
@@ -131,7 +154,7 @@ volumes:
   nuclei-reports:
   n8n-data:
 
-    # ─── RED ───────────────────────────────────────────────────
+# ─── RED ──────────────────────────────────────────────────────
 networks:
   secops-net:
     driver: bridge

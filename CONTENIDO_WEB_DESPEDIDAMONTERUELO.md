@@ -28,7 +28,7 @@ Este documento recopila **toda la información textual** que aparece en el sitio
 
 1. **1) Levanta el scanner (Docker)**  
    Importa el stack de **vm-scanner** (incluye n8n, ZAP y Nuclei wrapper) y ajusta variables.  
-   Enlaces: descargar `docker-compose.yml`, descargar `.env.example`.
+   Enlaces: descargar `docker-compose.yml`, descargar `.env.example`, descargar `nuclei-api.py`.
 
 2. **2) Importa workflows en n8n**  
    Workflows gemelos (DVWA / Juice Shop). Tras importar, sustituye `REPLACE_WITH_*` por secretos/vars reales.  
