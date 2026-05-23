@@ -124,17 +124,23 @@ window.navigate = (dir) => goTo(current + dir);
 document.addEventListener('click', async (e) => {
   const btn = e.target.closest('[data-copy], [data-copy-target]');
   if (!btn) return;
+  const copyHref = btn.getAttribute('data-copy-href');
   const targetId = btn.getAttribute('data-copy-target');
   let text = '';
-  if (targetId) {
+  if (copyHref) {
+    try {
+      const res = await fetch(copyHref);
+      if (res.ok) text = await res.text();
+    } catch (_) { /* fetch falló (p. ej. file://) */ }
+  }
+  if (!text && targetId) {
     const el = document.getElementById(targetId);
     if (el) {
       if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') text = el.value || '';
       else text = el.textContent || '';
     }
-  } else {
-    text = btn.getAttribute('data-copy') || '';
   }
+  if (!text) text = btn.getAttribute('data-copy') || '';
   const ok = await copyText(text);
   setCopyFeedback(btn, ok);
 });

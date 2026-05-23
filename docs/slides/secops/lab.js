@@ -126,7 +126,7 @@ export default {
               type="button"
               aria-label="Copiar docker-compose.yml"
               title="Copiar"
-              data-copy-target="secops-compose-yml"
+              data-copy-href="assets/downloads/vm-scanner/docker-compose.yml"
             >Copiar</button>
           </div>
         </div>
@@ -142,15 +142,15 @@ export default {
         zap.sh -daemon -host 0.0.0.0 -port 8090
         -config api.addrs.addr.name=.*
         -config api.addrs.addr.regex=true
-        -config api.key=\${ZAP_API_KEY}
+        -config api.key={ZAP_API_KEY}
         -config api.disablekey=false
         -config connection.timeoutInSecs=300
     <span class="c-yellow">ports</span>:
       - <span class="c-green">&quot;8090:8090&quot;</span>
     <span class="c-yellow">environment</span>:
-      - <span class="c-green">ZAP_API_KEY=\${ZAP_API_KEY}</span>
-      - <span class="c-green">DMZ_DVWA=\${DMZ_DVWA}</span>
-      - <span class="c-green">DMZ_JUICESHOP=\${DMZ_JUICESHOP}</span>
+      - <span class="c-green">ZAP_API_KEY={ZAP_API_KEY}</span>
+      - <span class="c-green">DMZ_DVWA={DMZ_DVWA}</span>
+      - <span class="c-green">DMZ_JUICESHOP={DMZ_JUICESHOP}</span>
       - <span class="c-green">_JAVA_OPTIONS=-Xmx2g</span>
     <span class="c-yellow">volumes</span>:
       - <span class="c-green">zap-data:/zap/wrk</span>
@@ -174,8 +174,8 @@ export default {
     <span class="c-yellow">restart</span>:<span class="c-green"> unless-stopped</span>
     <span class="c-yellow">entrypoint</span>:<span class="c-green"> [&quot;sleep&quot;, &quot;infinity&quot;]</span>
     <span class="c-yellow">environment</span>:
-      - <span class="c-green">DMZ_DVWA=\${DMZ_DVWA}</span>
-      - <span class="c-green">DMZ_JUICESHOP=\${DMZ_JUICESHOP}</span>
+      - <span class="c-green">DMZ_DVWA={DMZ_DVWA}</span>
+      - <span class="c-green">DMZ_JUICESHOP={DMZ_JUICESHOP}</span>
     <span class="c-yellow">volumes</span>:
       - <span class="c-green">nuclei-templates:/root/nuclei-templates</span>
       - <span class="c-green">nuclei-reports:/reports</span>
@@ -222,8 +222,8 @@ export default {
     <span class="c-yellow">ports</span>:
       - <span class="c-green">&quot;5000:5000&quot;</span>
     <span class="c-yellow">environment</span>:
-      - <span class="c-green">DMZ_DVWA=\${DMZ_DVWA}</span>
-      - <span class="c-green">DMZ_JUICESHOP=\${DMZ_JUICESHOP}</span>
+      - <span class="c-green">DMZ_DVWA={DMZ_DVWA}</span>
+      - <span class="c-green">DMZ_JUICESHOP={DMZ_JUICESHOP}</span>
     <span class="c-yellow">volumes</span>:
       - <span class="c-green">nuclei-templates:/root/nuclei-templates</span>
       - <span class="c-green">nuclei-reports:/reports</span>
@@ -246,22 +246,22 @@ export default {
       - <span class="c-green">N8N_HOST=0.0.0.0</span>
       - <span class="c-green">N8N_PORT=5678</span>
       - <span class="c-green">N8N_PROTOCOL=http</span>
-      - <span class="c-green">WEBHOOK_URL=http://\${SECOPS_IP}:5678</span>
+      - <span class="c-green">WEBHOOK_URL=http://{SECOPS_IP}:5678</span>
       - <span class="c-green">N8N_BASIC_AUTH_ACTIVE=false</span>
-      - <span class="c-green">N8N_USER_MANAGEMENT_JWT_SECRET=\${N8N_JWT_SECRET}</span>
-      - <span class="c-green">N8N_DEFAULT_USER_EMAIL=\${N8N_USER}</span>
-      - <span class="c-green">N8N_DEFAULT_USER_PASSWORD=\${N8N_PASSWORD}</span>
+      - <span class="c-green">N8N_USER_MANAGEMENT_JWT_SECRET={N8N_JWT_SECRET}</span>
+      - <span class="c-green">N8N_DEFAULT_USER_EMAIL={N8N_USER}</span>
+      - <span class="c-green">N8N_DEFAULT_USER_PASSWORD={N8N_PASSWORD}</span>
       - <span class="c-green">N8N_LOG_LEVEL=info</span>
       - <span class="c-green">N8N_COMMUNITY_PACKAGES_ENABLED=true</span>
       - <span class="c-green">N8N_SECURE_COOKIE=false</span>
       - <span class="c-green">N8N_ALLOW_EXEC=true</span>
       - <span class="c-green">GENERIC_TIMEZONE=Europe/Madrid</span>
       - <span class="c-green">TZ=Europe/Madrid</span>
-      - <span class="c-green">ZAP_API_KEY=\${ZAP_API_KEY}</span>
-      - <span class="c-green">OPENCLAW_TOKEN=\${OPENCLAW_TOKEN}</span>
-      - <span class="c-green">OPENCLAW_URL=http://host.docker.internal:\${OPENCLAW_PORT:-18789}</span>
-      - <span class="c-green">DMZ_DVWA=\${DMZ_DVWA}</span>
-      - <span class="c-green">DMZ_JUICESHOP=\${DMZ_JUICESHOP}</span>
+      - <span class="c-green">ZAP_API_KEY={ZAP_API_KEY}</span>
+      - <span class="c-green">OPENCLAW_TOKEN={OPENCLAW_TOKEN}</span>
+      - <span class="c-green">OPENCLAW_URL=http://host.docker.internal:{OPENCLAW_PORT:-18789}</span>
+      - <span class="c-green">DMZ_DVWA={DMZ_DVWA}</span>
+      - <span class="c-green">DMZ_JUICESHOP={DMZ_JUICESHOP}</span>
     <span class="c-yellow">volumes</span>:
       - <span class="c-green">n8n-data:/home/node/.n8n</span>
       - <span class="c-green">zap-reports:/zap-reports:ro</span>
@@ -303,7 +303,7 @@ export default {
             type="button"
             aria-label="Copiar ejemplo de .env"
             title="Copiar"
-            data-copy-target="secops-env"
+            data-copy-href="assets/downloads/vm-scanner/.env.example"
           >Copiar</button>
         </div>
       </div>
@@ -371,7 +371,7 @@ export default {
       </div>
 
       <div class="info-box">
-      <strong>Importante:</strong> en la slide he omitido tus claves reales. En el servidor se usan variables de entorno (<code>\${...}</code>) y secretos en <code>.env</code>.
+      <strong>Importante:</strong> en la slide he omitido tus claves reales. En el servidor se usan variables de entorno (<code>{VAR}</code> con <code>$</code> en el servidor) y secretos en <code>.env</code>.
       </div>
 
       <h3>// nuclei-api.py (wrapper)</h3>
@@ -383,7 +383,7 @@ export default {
           </div>
           <div class="code-header-actions">
             <a class="dl-btn" href="assets/downloads/vm-scanner/nuclei-api.py" download="nuclei-api.py">Descargar</a>
-            <button class="copy-btn" type="button" data-copy-target="secops-nuclei-api-py" aria-label="Copiar nuclei-api.py" title="Copiar">Copiar</button>
+            <button class="copy-btn" type="button" data-copy-href="assets/downloads/vm-scanner/nuclei-api.py" aria-label="Copiar nuclei-api.py" title="Copiar">Copiar</button>
           </div>
         </div>
         <div class="code-body"><span class="c-muted"># Flask wrapper para ejecutar Nuclei bajo demanda y devolver JSON</span>
@@ -396,170 +396,6 @@ export default {
         <strong>Por qué lo hacemos:</strong> Nuclei normalmente escribe a stdout/archivos. Este wrapper lo convierte en una API estable (timeouts, concurrency, JSONL) para que n8n pueda orquestar sin “magia” y sin depender de shells.
       </div>
 
-      <!-- Fuentes copiables (robusto, sin romper HTML) -->
-      <textarea id="secops-compose-yml" hidden>services:
-  # ─── OWASP ZAP ────────────────────────────────────────────────
-  zap:
-    image: ghcr.io/zaproxy/zaproxy:stable
-    container_name: owasp-zap
-    restart: unless-stopped
-    mem_limit: 4g
-    mem_reservation: 1g
-    command: >
-      zap.sh -daemon -host 0.0.0.0 -port 8090
-      -config api.addrs.addr.name=.*
-      -config api.addrs.addr.regex=true
-      -config api.key=\${ZAP_API_KEY}
-      -config api.disablekey=false
-      -config connection.timeoutInSecs=300
-    ports:
-      - "8090:8090"
-    environment:
-      - ZAP_API_KEY=\${ZAP_API_KEY}
-      - DMZ_DVWA=\${DMZ_DVWA}
-      - DMZ_JUICESHOP=\${DMZ_JUICESHOP}
-      - _JAVA_OPTIONS=-Xmx2g
-    volumes:
-      - zap-data:/zap/wrk
-      - zap-reports:/zap/reports
-    networks:
-      - secops-net
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -f http://localhost:8090/JSON/core/view/version/ || exit 1",
-        ]
-      interval: 20s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
-
-  # ─── NUCLEI (runner bajo demanda) ────────────────────────────
-  nuclei:
-    image: projectdiscovery/nuclei:latest
-    container_name: nuclei
-    restart: unless-stopped
-    entrypoint: ["sleep", "infinity"]
-    environment:
-      - DMZ_DVWA=\${DMZ_DVWA}
-      - DMZ_JUICESHOP=\${DMZ_JUICESHOP}
-    volumes:
-      - nuclei-templates:/root/nuclei-templates
-      - nuclei-reports:/reports
-    networks:
-      - secops-net
-    depends_on:
-      nuclei-updater:
-        condition: service_healthy
-
-  # ─── NUCLEI TEMPLATE UPDATER (cada 24h) ──────────────────────
-  # El bucle: intenta actualizar, espera 1h si falla, 24h si OK.
-  # restart: on-failure evita reinicios infinitos ante errores graves.
-  nuclei-updater:
-    image: projectdiscovery/nuclei:latest
-    container_name: nuclei-updater
-    restart: on-failure
-    entrypoint: >
-      sh -c "
-        while true; do
-          if nuclei -update-templates -ud /root/nuclei-templates; then
-            echo \"[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Templates actualizados OK\" >> /root/nuclei-templates/update.log;
-            sleep 86400;
-          else
-            echo \"[$(date -u +%Y-%m-%dT%H:%M:%SZ)] ERROR al actualizar templates, reintentando en 1h\" >> /root/nuclei-templates/update.log;
-            sleep 3600;
-          fi
-        done"
-    volumes:
-      - nuclei-templates:/root/nuclei-templates
-    networks:
-      - secops-net
-    healthcheck:
-      test: ["CMD-SHELL", "test -f /root/nuclei-templates/update.log || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 120s
-
-  # ─── NUCLEI API WRAPPER ───────────────────────────────────────
-  nuclei-api:
-    build:
-      context: .
-      dockerfile: Dockerfile.nuclei-api
-    container_name: nuclei-api
-    restart: unless-stopped
-    ports:
-      - "5000:5000"
-    environment:
-      - DMZ_DVWA=\${DMZ_DVWA}
-      - DMZ_JUICESHOP=\${DMZ_JUICESHOP}
-    volumes:
-      - nuclei-templates:/root/nuclei-templates
-      - nuclei-reports:/reports
-      - ./nuclei-api.py:/app/nuclei-api.py
-    working_dir: /app
-    networks:
-      - secops-net
-    depends_on:
-      nuclei-updater:
-        condition: service_healthy
-
-  # ─── N8N ──────────────────────────────────────────────────────
-  n8n:
-    image: n8nio/n8n:latest
-    container_name: n8n
-    restart: unless-stopped
-    ports:
-      - "5678:5678"
-    environment:
-      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
-      - N8N_HOST=0.0.0.0
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - WEBHOOK_URL=http://\${SECOPS_IP}:5678
-      - N8N_BASIC_AUTH_ACTIVE=false
-      - N8N_USER_MANAGEMENT_JWT_SECRET=\${N8N_JWT_SECRET}
-      - N8N_DEFAULT_USER_EMAIL=\${N8N_USER}
-      - N8N_DEFAULT_USER_PASSWORD=\${N8N_PASSWORD}
-      - N8N_LOG_LEVEL=info
-      - N8N_COMMUNITY_PACKAGES_ENABLED=true
-      - N8N_SECURE_COOKIE=false
-      - N8N_ALLOW_EXEC=true
-      - GENERIC_TIMEZONE=Europe/Madrid
-      - TZ=Europe/Madrid
-      - ZAP_API_KEY=\${ZAP_API_KEY}
-      - OPENCLAW_TOKEN=\${OPENCLAW_TOKEN}
-      - OPENCLAW_URL=http://host.docker.internal:\${OPENCLAW_PORT:-18789}
-      - DMZ_DVWA=\${DMZ_DVWA}
-      - DMZ_JUICESHOP=\${DMZ_JUICESHOP}
-    volumes:
-      - n8n-data:/home/node/.n8n
-      - zap-reports:/zap-reports:ro
-      - nuclei-reports:/home/node/.n8n-files/nuclei-reports:ro
-    networks:
-      - secops-net
-    depends_on:
-      zap:
-        condition: service_healthy
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
-# ─── VOLÚMENES ────────────────────────────────────────────────
-volumes:
-  zap-data:
-  zap-reports:
-  nuclei-templates:
-  nuclei-reports:
-  n8n-data:
-
-# ─── RED ──────────────────────────────────────────────────────
-networks:
-  secops-net:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/24</textarea>
 
       <textarea id="secops-env" hidden># ─── IPs de los targets en la VLAN DMZ ───────────────────────
 DMZ_DVWA=http://203.0.113.X:8080

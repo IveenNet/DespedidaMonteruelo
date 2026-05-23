@@ -92,7 +92,7 @@ export default {
             <button
               class="copy-btn"
               type="button"
-              data-copy-target="targets-compose-yml"
+              data-copy-href="assets/downloads/vm-web/docker-compose.yml"
               aria-label="Copiar docker-compose.yml"
               title="Copiar"
             >Copiar</button>
@@ -125,9 +125,9 @@ export default {
     <span class="c-yellow">mem_reservation</span>:<span class="c-green"> 128m</span>
     <span class="c-yellow">environment</span>:
       - <span class="c-green">DB_SERVER=db</span>
-      - <span class="c-green">DB_DATABASE=\${DVWA_DB:-dvwa}</span>
-      - <span class="c-green">DB_USER=\${DVWA_USER:-dvwa}</span>
-      - <span class="c-green">DB_PASSWORD=\${DVWA_PASSWORD:-p@ssw0rd}</span>
+      - <span class="c-green">DB_DATABASE={DVWA_DB:-dvwa}</span>
+      - <span class="c-green">DB_USER={DVWA_USER:-dvwa}</span>
+      - <span class="c-green">DB_PASSWORD={DVWA_PASSWORD:-p@ssw0rd}</span>
     <span class="c-yellow">depends_on</span>:
       <span class="c-yellow">db</span>:
         <span class="c-yellow">condition</span>:<span class="c-green"> service_healthy</span>
@@ -143,10 +143,10 @@ export default {
     <span class="c-yellow">mem_limit</span>:<span class="c-green"> 256m</span>
     <span class="c-yellow">mem_reservation</span>:<span class="c-green"> 128m</span>
     <span class="c-yellow">environment</span>:
-      - <span class="c-green">MYSQL_ROOT_PASSWORD=\${DVWA_ROOT_PASSWORD:-dvwa_root}</span>
-      - <span class="c-green">MYSQL_DATABASE=\${DVWA_DB:-dvwa}</span>
-      - <span class="c-green">MYSQL_USER=\${DVWA_USER:-dvwa}</span>
-      - <span class="c-green">MYSQL_PASSWORD=\${DVWA_PASSWORD:-p@ssw0rd}</span>
+      - <span class="c-green">MYSQL_ROOT_PASSWORD={DVWA_ROOT_PASSWORD:-dvwa_root}</span>
+      - <span class="c-green">MYSQL_DATABASE={DVWA_DB:-dvwa}</span>
+      - <span class="c-green">MYSQL_USER={DVWA_USER:-dvwa}</span>
+      - <span class="c-green">MYSQL_PASSWORD={DVWA_PASSWORD:-p@ssw0rd}</span>
     <span class="c-yellow">volumes</span>:
       - <span class="c-green">dvwa-db-data:/var/lib/mysql</span>
     <span class="c-yellow">networks</span>:
@@ -155,7 +155,7 @@ export default {
       <span class="c-yellow">test</span>:
           [
             &quot;CMD-SHELL&quot;,
-            &quot;mysqladmin ping -h localhost -u root -p\${DVWA_ROOT_PASSWORD:-dvwa_root} --silent&quot;,
+            &quot;mysqladmin ping -h localhost -u root -p{DVWA_ROOT_PASSWORD:-dvwa_root} --silent&quot;,
           ]
       <span class="c-yellow">interval</span>:<span class="c-green"> 10s</span>
       <span class="c-yellow">timeout</span>:<span class="c-green"> 5s</span>
@@ -167,6 +167,10 @@ export default {
 <span class="c-yellow">networks</span>:
   <span class="c-yellow">dmz-internal</span>:
     <span class="c-yellow">driver</span>:<span class="c-green"> bridge</span></div>
+      </div>
+
+      <div class="info-box">
+        En Docker Compose las variables van con <code>$</code> delante de las llaves (ej. <code>{DVWA_DB:-dvwa}</code> en el servidor). Usa <strong>Descargar</strong> o <strong>Copiar</strong> para el YAML exacto.
       </div>
 
       <h3>// instalación paso a paso</h3>
@@ -248,80 +252,6 @@ export default {
         <strong>Credenciales DVWA:</strong> usuario <code>admin</code> · contraseña <code>password</code><br>
         Establecer nivel <strong>Low</strong> en DVWA Security para maximizar la superficie de ataque durante el escaneo.
       </div>
-
-      <textarea id="targets-compose-yml" hidden>services:
-  # ─── JUICE SHOP ───────────────────────────────────────────────
-  juice-shop:
-    image: bkimminich/juice-shop
-    container_name: juice-shop
-    restart: unless-stopped
-    mem_limit: 512m
-    mem_reservation: 256m
-    ports:
-      - "3000:3000"
-    networks:
-      - dmz-internal
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3000 || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
-  # ─── DVWA ─────────────────────────────────────────────────────
-  dvwa:
-    image: ghcr.io/digininja/dvwa:latest
-    container_name: dvwa
-    restart: unless-stopped
-    mem_limit: 256m
-    mem_reservation: 128m
-    environment:
-      - DB_SERVER=db
-      - DB_DATABASE=\${DVWA_DB:-dvwa}
-      - DB_USER=\${DVWA_USER:-dvwa}
-      - DB_PASSWORD=\${DVWA_PASSWORD:-p@ssw0rd}
-    depends_on:
-      db:
-        condition: service_healthy
-    ports:
-      - "8080:80"
-    networks:
-      - dmz-internal
-
-  # ─── MARIADB ──────────────────────────────────────────────────
-  db:
-    image: mariadb:10.11
-    container_name: dvwa-db
-    restart: unless-stopped
-    mem_limit: 256m
-    mem_reservation: 128m
-    environment:
-      - MYSQL_ROOT_PASSWORD=\${DVWA_ROOT_PASSWORD:-dvwa_root}
-      - MYSQL_DATABASE=\${DVWA_DB:-dvwa}
-      - MYSQL_USER=\${DVWA_USER:-dvwa}
-      - MYSQL_PASSWORD=\${DVWA_PASSWORD:-p@ssw0rd}
-    volumes:
-      - dvwa-db-data:/var/lib/mysql
-    networks:
-      - dmz-internal
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "mysqladmin ping -h localhost -u root -p\${DVWA_ROOT_PASSWORD:-dvwa_root} --silent",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 6
-      start_period: 30s
-
-# ─── VOLÚMENES ────────────────────────────────────────────────
-volumes:
-  dvwa-db-data:
-
-networks:
-  dmz-internal:
-    driver: bridge</textarea>
     </div>
   `,
 };
