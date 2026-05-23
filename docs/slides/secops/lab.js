@@ -142,15 +142,15 @@ export default {
         zap.sh -daemon -host 0.0.0.0 -port 8090
         -config api.addrs.addr.name=.*
         -config api.addrs.addr.regex=true
-        -config api.key=${ZAP_API_KEY}
+        -config api.key=\${ZAP_API_KEY}
         -config api.disablekey=false
         -config connection.timeoutInSecs=300
     <span class="c-yellow">ports</span>:
       - <span class="c-green">&quot;8090:8090&quot;</span>
     <span class="c-yellow">environment</span>:
-      - <span class="c-green">ZAP_API_KEY=${ZAP_API_KEY}</span>
-      - <span class="c-green">DMZ_DVWA=${DMZ_DVWA}</span>
-      - <span class="c-green">DMZ_JUICESHOP=${DMZ_JUICESHOP}</span>
+      - <span class="c-green">ZAP_API_KEY=\${ZAP_API_KEY}</span>
+      - <span class="c-green">DMZ_DVWA=\${DMZ_DVWA}</span>
+      - <span class="c-green">DMZ_JUICESHOP=\${DMZ_JUICESHOP}</span>
       - <span class="c-green">_JAVA_OPTIONS=-Xmx2g</span>
     <span class="c-yellow">volumes</span>:
       - <span class="c-green">zap-data:/zap/wrk</span>
@@ -174,8 +174,8 @@ export default {
     <span class="c-yellow">restart</span>:<span class="c-green"> unless-stopped</span>
     <span class="c-yellow">entrypoint</span>:<span class="c-green"> [&quot;sleep&quot;, &quot;infinity&quot;]</span>
     <span class="c-yellow">environment</span>:
-      - <span class="c-green">DMZ_DVWA=${DMZ_DVWA}</span>
-      - <span class="c-green">DMZ_JUICESHOP=${DMZ_JUICESHOP}</span>
+      - <span class="c-green">DMZ_DVWA=\${DMZ_DVWA}</span>
+      - <span class="c-green">DMZ_JUICESHOP=\${DMZ_JUICESHOP}</span>
     <span class="c-yellow">volumes</span>:
       - <span class="c-green">nuclei-templates:/root/nuclei-templates</span>
       - <span class="c-green">nuclei-reports:/reports</span>
@@ -222,8 +222,8 @@ export default {
     <span class="c-yellow">ports</span>:
       - <span class="c-green">&quot;5000:5000&quot;</span>
     <span class="c-yellow">environment</span>:
-      - <span class="c-green">DMZ_DVWA=${DMZ_DVWA}</span>
-      - <span class="c-green">DMZ_JUICESHOP=${DMZ_JUICESHOP}</span>
+      - <span class="c-green">DMZ_DVWA=\${DMZ_DVWA}</span>
+      - <span class="c-green">DMZ_JUICESHOP=\${DMZ_JUICESHOP}</span>
     <span class="c-yellow">volumes</span>:
       - <span class="c-green">nuclei-templates:/root/nuclei-templates</span>
       - <span class="c-green">nuclei-reports:/reports</span>
@@ -246,22 +246,22 @@ export default {
       - <span class="c-green">N8N_HOST=0.0.0.0</span>
       - <span class="c-green">N8N_PORT=5678</span>
       - <span class="c-green">N8N_PROTOCOL=http</span>
-      - <span class="c-green">WEBHOOK_URL=http://${SECOPS_IP}:5678</span>
+      - <span class="c-green">WEBHOOK_URL=http://\${SECOPS_IP}:5678</span>
       - <span class="c-green">N8N_BASIC_AUTH_ACTIVE=false</span>
-      - <span class="c-green">N8N_USER_MANAGEMENT_JWT_SECRET=${N8N_JWT_SECRET}</span>
-      - <span class="c-green">N8N_DEFAULT_USER_EMAIL=${N8N_USER}</span>
-      - <span class="c-green">N8N_DEFAULT_USER_PASSWORD=${N8N_PASSWORD}</span>
+      - <span class="c-green">N8N_USER_MANAGEMENT_JWT_SECRET=\${N8N_JWT_SECRET}</span>
+      - <span class="c-green">N8N_DEFAULT_USER_EMAIL=\${N8N_USER}</span>
+      - <span class="c-green">N8N_DEFAULT_USER_PASSWORD=\${N8N_PASSWORD}</span>
       - <span class="c-green">N8N_LOG_LEVEL=info</span>
       - <span class="c-green">N8N_COMMUNITY_PACKAGES_ENABLED=true</span>
       - <span class="c-green">N8N_SECURE_COOKIE=false</span>
       - <span class="c-green">N8N_ALLOW_EXEC=true</span>
       - <span class="c-green">GENERIC_TIMEZONE=Europe/Madrid</span>
       - <span class="c-green">TZ=Europe/Madrid</span>
-      - <span class="c-green">ZAP_API_KEY=${ZAP_API_KEY}</span>
-      - <span class="c-green">OPENCLAW_TOKEN=${OPENCLAW_TOKEN}</span>
-      - <span class="c-green">OPENCLAW_URL=http://host.docker.internal:${OPENCLAW_PORT:-18789}</span>
-      - <span class="c-green">DMZ_DVWA=${DMZ_DVWA}</span>
-      - <span class="c-green">DMZ_JUICESHOP=${DMZ_JUICESHOP}</span>
+      - <span class="c-green">ZAP_API_KEY=\${ZAP_API_KEY}</span>
+      - <span class="c-green">OPENCLAW_TOKEN=\${OPENCLAW_TOKEN}</span>
+      - <span class="c-green">OPENCLAW_URL=http://host.docker.internal:\${OPENCLAW_PORT:-18789}</span>
+      - <span class="c-green">DMZ_DVWA=\${DMZ_DVWA}</span>
+      - <span class="c-green">DMZ_JUICESHOP=\${DMZ_JUICESHOP}</span>
     <span class="c-yellow">volumes</span>:
       - <span class="c-green">n8n-data:/home/node/.n8n</span>
       - <span class="c-green">zap-reports:/zap-reports:ro</span>
