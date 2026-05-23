@@ -1,28 +1,73 @@
 services:
+  # ─── JUICE SHOP ───────────────────────────────────────────────
   juice-shop:
     image: bkimminich/juice-shop
     container_name: juice-shop
     restart: unless-stopped
+    mem_limit: 512m
+    mem_reservation: 256m
     ports:
       - "3000:3000"
+    networks:
+      - dmz-internal
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
+  # ─── DVWA ─────────────────────────────────────────────────────
   dvwa:
     image: ghcr.io/digininja/dvwa:latest
     container_name: dvwa
     restart: unless-stopped
+    mem_limit: 256m
+    mem_reservation: 128m
     environment:
       - DB_SERVER=db
+      - DB_DATABASE=${DVWA_DB:-dvwa}
+      - DB_USER=${DVWA_USER:-dvwa}
+      - DB_PASSWORD=${DVWA_PASSWORD:-p@ssw0rd}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - "8080:80"
+    networks:
+      - dmz-internal
 
+  # ─── MARIADB ──────────────────────────────────────────────────
   db:
     image: mariadb:10.11
     container_name: dvwa-db
     restart: unless-stopped
+    mem_limit: 256m
+    mem_reservation: 128m
     environment:
-      - MYSQL_ROOT_PASSWORD=dvwa
-      - MYSQL_DATABASE=dvwa
-      - MYSQL_USER=dvwa
-      - MYSQL_PASSWORD=p@ssw0rd
+      - MYSQL_ROOT_PASSWORD=${DVWA_ROOT_PASSWORD:-dvwa_root}
+      - MYSQL_DATABASE=${DVWA_DB:-dvwa}
+      - MYSQL_USER=${DVWA_USER:-dvwa}
+      - MYSQL_PASSWORD=${DVWA_PASSWORD:-p@ssw0rd}
+    volumes:
+      - dvwa-db-data:/var/lib/mysql
+    networks:
+      - dmz-internal
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -u root -p${DVWA_ROOT_PASSWORD:-dvwa_root} --silent",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+
+# ─── VOLÚMENES ────────────────────────────────────────────────
+volumes:
+  dvwa-db-data:
+
+networks:
+  dmz-internal:
+    driver: bridge

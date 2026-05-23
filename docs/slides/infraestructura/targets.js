@@ -14,6 +14,7 @@ export default {
       <div class="slide-actions">
         <button class="btn btn--inline" type="button" data-open-modal="implGuide">Abrir guía de implementación</button>
         <a class="btn btn--ghost" href="assets/downloads/vm-web/docker-compose.yml" download="docker-compose.yml">Descargar compose</a>
+        <a class="btn btn--ghost" href="assets/downloads/vm-web/env.dmz" download="env.dmz">Descargar env.dmz</a>
       </div>
 
       <!-- Topología / estado (animado) -->
@@ -91,37 +92,81 @@ export default {
             <button
               class="copy-btn"
               type="button"
-              data-copy="services:\n  juice-shop:\n    image: bkimminich/juice-shop\n    container_name: juice-shop\n    restart: unless-stopped\n    ports:\n      - &quot;3000:3000&quot;\n\n  dvwa:\n    image: ghcr.io/digininja/dvwa:latest\n    container_name: dvwa\n    restart: unless-stopped\n    environment:\n      - DB_SERVER=db\n    depends_on: [db]\n    ports:\n      - &quot;8080:80&quot;\n\n  db:\n    image: mariadb:10.11\n    environment:\n      - MYSQL_ROOT_PASSWORD=dvwa\n      - MYSQL_DATABASE=dvwa\n      - MYSQL_USER=dvwa\n      - MYSQL_PASSWORD=p@ssw0rd"
+              data-copy-target="targets-compose-yml"
               aria-label="Copiar docker-compose.yml"
               title="Copiar"
             >Copiar</button>
           </div>
         </div>
-        <div class="code-body"><span class="c-muted">services:</span>
-  <span class="c-cyan">juice-shop</span>:
-    <span class="c-yellow">image</span>: <span class="c-green">bkimminich/juice-shop</span>
-    <span class="c-yellow">container_name</span>: juice-shop
-    <span class="c-yellow">restart</span>: unless-stopped
+        <div class="code-body"><span class="c-yellow">services</span>:
+  <span class="c-muted">  # ─── JUICE SHOP ───────────────────────────────────────────────</span>
+  <span class="c-yellow">juice-shop</span>:
+    <span class="c-yellow">image</span>:<span class="c-green"> bkimminich/juice-shop</span>
+    <span class="c-yellow">container_name</span>:<span class="c-green"> juice-shop</span>
+    <span class="c-yellow">restart</span>:<span class="c-green"> unless-stopped</span>
+    <span class="c-yellow">mem_limit</span>:<span class="c-green"> 512m</span>
+    <span class="c-yellow">mem_reservation</span>:<span class="c-green"> 256m</span>
     <span class="c-yellow">ports</span>:
-      - <span class="c-green">"3000:3000"</span>
-
-  <span class="c-cyan">dvwa</span>:
-    <span class="c-yellow">image</span>: <span class="c-green">ghcr.io/digininja/dvwa:latest</span>
-    <span class="c-yellow">container_name</span>: dvwa
-    <span class="c-yellow">restart</span>: unless-stopped
+      - <span class="c-green">&quot;3000:3000&quot;</span>
+    <span class="c-yellow">networks</span>:
+      - <span class="c-green">dmz-internal</span>
+    <span class="c-yellow">healthcheck</span>:
+      <span class="c-yellow">test</span>:<span class="c-green"> [&quot;CMD-SHELL&quot;, &quot;wget -qO- http://localhost:3000 || exit 1&quot;]</span>
+      <span class="c-yellow">interval</span>:<span class="c-green"> 30s</span>
+      <span class="c-yellow">timeout</span>:<span class="c-green"> 10s</span>
+      <span class="c-yellow">retries</span>:<span class="c-green"> 3</span>
+      <span class="c-yellow">start_period</span>:<span class="c-green"> 30s</span>
+  <span class="c-muted">  # ─── DVWA ─────────────────────────────────────────────────────</span>
+  <span class="c-yellow">dvwa</span>:
+    <span class="c-yellow">image</span>:<span class="c-green"> ghcr.io/digininja/dvwa:latest</span>
+    <span class="c-yellow">container_name</span>:<span class="c-green"> dvwa</span>
+    <span class="c-yellow">restart</span>:<span class="c-green"> unless-stopped</span>
+    <span class="c-yellow">mem_limit</span>:<span class="c-green"> 256m</span>
+    <span class="c-yellow">mem_reservation</span>:<span class="c-green"> 128m</span>
     <span class="c-yellow">environment</span>:
       - <span class="c-green">DB_SERVER=db</span>
-    <span class="c-yellow">depends_on</span>: [db]
+      - <span class="c-green">DB_DATABASE=${DVWA_DB:-dvwa}</span>
+      - <span class="c-green">DB_USER=${DVWA_USER:-dvwa}</span>
+      - <span class="c-green">DB_PASSWORD=${DVWA_PASSWORD:-p@ssw0rd}</span>
+    <span class="c-yellow">depends_on</span>:
+      <span class="c-yellow">db</span>:
+        <span class="c-yellow">condition</span>:<span class="c-green"> service_healthy</span>
     <span class="c-yellow">ports</span>:
-      - <span class="c-green">"8080:80"</span>
-
-  <span class="c-cyan">db</span>:
-    <span class="c-yellow">image</span>: <span class="c-green">mariadb:10.11</span>
+      - <span class="c-green">&quot;8080:80&quot;</span>
+    <span class="c-yellow">networks</span>:
+      - <span class="c-green">dmz-internal</span>
+  <span class="c-muted">  # ─── MARIADB ──────────────────────────────────────────────────</span>
+  <span class="c-yellow">db</span>:
+    <span class="c-yellow">image</span>:<span class="c-green"> mariadb:10.11</span>
+    <span class="c-yellow">container_name</span>:<span class="c-green"> dvwa-db</span>
+    <span class="c-yellow">restart</span>:<span class="c-green"> unless-stopped</span>
+    <span class="c-yellow">mem_limit</span>:<span class="c-green"> 256m</span>
+    <span class="c-yellow">mem_reservation</span>:<span class="c-green"> 128m</span>
     <span class="c-yellow">environment</span>:
-      - <span class="c-green">MYSQL_ROOT_PASSWORD=dvwa</span>
-      - <span class="c-green">MYSQL_DATABASE=dvwa</span>
-      - <span class="c-green">MYSQL_USER=dvwa</span>
-      - <span class="c-green">MYSQL_PASSWORD=p@ssw0rd</span></div>
+      - <span class="c-green">MYSQL_ROOT_PASSWORD=${DVWA_ROOT_PASSWORD:-dvwa_root}</span>
+      - <span class="c-green">MYSQL_DATABASE=${DVWA_DB:-dvwa}</span>
+      - <span class="c-green">MYSQL_USER=${DVWA_USER:-dvwa}</span>
+      - <span class="c-green">MYSQL_PASSWORD=${DVWA_PASSWORD:-p@ssw0rd}</span>
+    <span class="c-yellow">volumes</span>:
+      - <span class="c-green">dvwa-db-data:/var/lib/mysql</span>
+    <span class="c-yellow">networks</span>:
+      - <span class="c-green">dmz-internal</span>
+    <span class="c-yellow">healthcheck</span>:
+      <span class="c-yellow">test</span>:
+          [
+            &quot;CMD-SHELL&quot;,
+            &quot;mysqladmin ping -h localhost -u root -p${DVWA_ROOT_PASSWORD:-dvwa_root} --silent&quot;,
+          ]
+      <span class="c-yellow">interval</span>:<span class="c-green"> 10s</span>
+      <span class="c-yellow">timeout</span>:<span class="c-green"> 5s</span>
+      <span class="c-yellow">retries</span>:<span class="c-green"> 6</span>
+      <span class="c-yellow">start_period</span>:<span class="c-green"> 30s</span>
+  <span class="c-muted"># ─── VOLÚMENES ────────────────────────────────────────────────</span>
+<span class="c-yellow">volumes</span>:
+  <span class="c-yellow">dvwa-db-data</span>:
+<span class="c-yellow">networks</span>:
+  <span class="c-yellow">dmz-internal</span>:
+    <span class="c-yellow">driver</span>:<span class="c-green"> bridge</span></div>
       </div>
 
       <h3>// instalación paso a paso</h3>
@@ -152,7 +197,7 @@ export default {
           <div class="step-num">02</div>
           <div class="install-body">
             <div class="step-title">Crear carpeta y compose</div>
-            <div class="step-desc">Prepara la carpeta y pega el YAML:</div>
+            <div class="step-desc">Prepara la carpeta, copia el YAML y (opcional) <code>env.dmz</code> como <code>.env</code> para credenciales de MariaDB/DVWA:</div>
             <div class="cmd-list">
               <div class="cmd-row">
                 <code class="cmd">mkdir ~/vm-targets && cd ~/vm-targets</code>

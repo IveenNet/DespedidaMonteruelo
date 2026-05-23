@@ -14,6 +14,8 @@ export default {
       <div class="slide-actions">
         <button class="btn btn--inline" type="button" data-open-modal="implGuide">Abrir guía de implementación</button>
         <a class="btn btn--ghost" href="assets/downloads/vm-scanner/docker-compose.yml" download="docker-compose.yml">Descargar compose</a>
+        <a class="btn btn--ghost" href="assets/downloads/vm-scanner/nuclei-api.py" download="nuclei-api.py">Descargar nuclei-api.py</a>
+        <a class="btn btn--ghost" href="assets/downloads/vm-scanner/.env.example" download=".env.example">Descargar .env.example</a>
       </div>
 
       <!-- Topología / estado (animado) -->
@@ -31,7 +33,7 @@ export default {
               <span class="t-status t-status-up"><span class="t-dot"></span>:5678</span>
             </div>
             <div class="t-meta">
-              <span class="t-pill">BASIC auth</span>
+              <span class="t-pill">user mgmt</span>
               <span class="t-pill t-pill-img">n8nio/n8n</span>
               <span class="t-pill t-pill-net">secops-net</span>
             </div>
@@ -63,7 +65,7 @@ export default {
             <div class="t-meta">
               <span class="t-pill">Flask</span>
               <span class="t-pill">POST /scan</span>
-              <span class="t-pill t-pill-img">nuclei:latest</span>
+              <span class="t-pill t-pill-img">Dockerfile</span>
             </div>
           </div>
 
@@ -128,23 +130,27 @@ export default {
             >Copiar</button>
           </div>
         </div>
-        <div class="code-body"><span class="c-muted">services:</span>
-
-  <span class="c-muted"># ─── OWASP ZAP ─────────────────────────────────────────────</span>
-  <span class="c-cyan">zap</span>:
-    <span class="c-yellow">image</span>: <span class="c-green">ghcr.io/zaproxy/zaproxy:stable</span>
-    <span class="c-yellow">container_name</span>: <span class="c-green">owasp-zap</span>
-    <span class="c-yellow">restart</span>: <span class="c-green">unless-stopped</span>
-    <span class="c-yellow">mem_limit</span>: <span class="c-green">4g</span>
-    <span class="c-yellow">mem_reservation</span>: <span class="c-green">1g</span>
-    <span class="c-yellow">command</span>: <span class="c-muted">&gt;</span>
-      <span class="c-green">zap.sh -daemon -host 0.0.0.0 -port 8090 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true -config api.key=\${ZAP_API_KEY} -config api.disablekey=false -config connection.timeoutInSecs=300</span>
+        <div class="code-body"><span class="c-yellow">services</span>:
+  <span class="c-muted">  # ─── OWASP ZAP ────────────────────────────────────────────────</span>
+  <span class="c-yellow">zap</span>:
+    <span class="c-yellow">image</span>:<span class="c-green"> ghcr.io/zaproxy/zaproxy:stable</span>
+    <span class="c-yellow">container_name</span>:<span class="c-green"> owasp-zap</span>
+    <span class="c-yellow">restart</span>:<span class="c-green"> unless-stopped</span>
+    <span class="c-yellow">mem_limit</span>:<span class="c-green"> 4g</span>
+    <span class="c-yellow">mem_reservation</span>:<span class="c-green"> 1g</span>
+    <span class="c-yellow">command</span>:<span class="c-green"> &gt;</span>
+        zap.sh -daemon -host 0.0.0.0 -port 8090
+        -config api.addrs.addr.name=.*
+        -config api.addrs.addr.regex=true
+        -config api.key=${ZAP_API_KEY}
+        -config api.disablekey=false
+        -config connection.timeoutInSecs=300
     <span class="c-yellow">ports</span>:
       - <span class="c-green">&quot;8090:8090&quot;</span>
     <span class="c-yellow">environment</span>:
-      - <span class="c-green">ZAP_API_KEY=\${ZAP_API_KEY}</span>
-      - <span class="c-green">DMZ_DVWA=\${DMZ_DVWA}</span>
-      - <span class="c-green">DMZ_JUICESHOP=\${DMZ_JUICESHOP}</span>
+      - <span class="c-green">ZAP_API_KEY=${ZAP_API_KEY}</span>
+      - <span class="c-green">DMZ_DVWA=${DMZ_DVWA}</span>
+      - <span class="c-green">DMZ_JUICESHOP=${DMZ_JUICESHOP}</span>
       - <span class="c-green">_JAVA_OPTIONS=-Xmx2g</span>
     <span class="c-yellow">volumes</span>:
       - <span class="c-green">zap-data:/zap/wrk</span>
@@ -152,71 +158,87 @@ export default {
     <span class="c-yellow">networks</span>:
       - <span class="c-green">secops-net</span>
     <span class="c-yellow">healthcheck</span>:
-      <span class="c-yellow">test</span>: [ <span class="c-green">&quot;CMD-SHELL&quot;</span>, <span class="c-green">&quot;curl -f http://localhost:8090/JSON/core/view/version/ || exit 1&quot;</span> ]
-      <span class="c-yellow">interval</span>: <span class="c-green">20s</span>
-      <span class="c-yellow">timeout</span>: <span class="c-green">10s</span>
-      <span class="c-yellow">retries</span>: <span class="c-green">5</span>
-      <span class="c-yellow">start_period</span>: <span class="c-green">60s</span>
-  <span class="c-muted"># ─── NUCLEI ────────────────────────────────────────────────</span>
-  <span class="c-cyan">nuclei</span>:
-    <span class="c-yellow">image</span>: <span class="c-green">projectdiscovery/nuclei:latest</span>
-    <span class="c-yellow">container_name</span>: <span class="c-green">nuclei</span>
-    <span class="c-yellow">restart</span>: <span class="c-green">unless-stopped</span>
-    <span class="c-yellow">entrypoint</span>: [ <span class="c-green">&quot;sleep&quot;</span>, <span class="c-green">&quot;infinity&quot;</span> ]
+      <span class="c-yellow">test</span>:
+          [
+            &quot;CMD-SHELL&quot;,
+            &quot;curl -f http://localhost:8090/JSON/core/view/version/ || exit 1&quot;,
+          ]
+      <span class="c-yellow">interval</span>:<span class="c-green"> 20s</span>
+      <span class="c-yellow">timeout</span>:<span class="c-green"> 10s</span>
+      <span class="c-yellow">retries</span>:<span class="c-green"> 5</span>
+      <span class="c-yellow">start_period</span>:<span class="c-green"> 60s</span>
+  <span class="c-muted">  # ─── NUCLEI (runner bajo demanda) ────────────────────────────</span>
+  <span class="c-yellow">nuclei</span>:
+    <span class="c-yellow">image</span>:<span class="c-green"> projectdiscovery/nuclei:latest</span>
+    <span class="c-yellow">container_name</span>:<span class="c-green"> nuclei</span>
+    <span class="c-yellow">restart</span>:<span class="c-green"> unless-stopped</span>
+    <span class="c-yellow">entrypoint</span>:<span class="c-green"> [&quot;sleep&quot;, &quot;infinity&quot;]</span>
     <span class="c-yellow">environment</span>:
-      - <span class="c-green">DMZ_DVWA=\${DMZ_DVWA}</span>
-      - <span class="c-green">DMZ_JUICESHOP=\${DMZ_JUICESHOP}</span>
+      - <span class="c-green">DMZ_DVWA=${DMZ_DVWA}</span>
+      - <span class="c-green">DMZ_JUICESHOP=${DMZ_JUICESHOP}</span>
     <span class="c-yellow">volumes</span>:
       - <span class="c-green">nuclei-templates:/root/nuclei-templates</span>
       - <span class="c-green">nuclei-reports:/reports</span>
     <span class="c-yellow">networks</span>:
       - <span class="c-green">secops-net</span>
-
-  <span class="c-muted"># ─── NUCLEI TEMPLATE UPDATER (cada 24h) ────────────────────</span>
-  <span class="c-cyan">nuclei-updater</span>:
-    <span class="c-yellow">image</span>: <span class="c-green">projectdiscovery/nuclei:latest</span>
-    <span class="c-yellow">container_name</span>: <span class="c-green">nuclei-updater</span>
-    <span class="c-yellow">restart</span>: <span class="c-green">unless-stopped</span>
-    <span class="c-yellow">entrypoint</span>: <span class="c-muted">&gt;</span>
-      <span class="c-green">sh -c &quot;while true; do
-        nuclei -update-templates -ud /root/nuclei-templates &amp;&amp;
-        echo &quot;[updater] Templates OK&quot; &gt;&gt; /root/nuclei-templates/update.log 2&gt;&amp;1;
-        sleep 86400;
-      done&quot;</span>
+    <span class="c-yellow">depends_on</span>:
+      <span class="c-yellow">nuclei-updater</span>:
+        <span class="c-yellow">condition</span>:<span class="c-green"> service_healthy</span>
+  <span class="c-muted">  # ─── NUCLEI TEMPLATE UPDATER (cada 24h) ──────────────────────</span>
+  <span class="c-muted">  # El bucle: intenta actualizar, espera 1h si falla, 24h si OK.</span>
+  <span class="c-muted">  # restart: on-failure evita reinicios infinitos ante errores graves.</span>
+  <span class="c-yellow">nuclei-updater</span>:
+    <span class="c-yellow">image</span>:<span class="c-green"> projectdiscovery/nuclei:latest</span>
+    <span class="c-yellow">container_name</span>:<span class="c-green"> nuclei-updater</span>
+    <span class="c-yellow">restart</span>:<span class="c-green"> on-failure</span>
+    <span class="c-yellow">entrypoint</span>:<span class="c-green"> &gt;</span>
+        sh -c &quot;
+          while true; do
+            if nuclei -update-templates -ud /root/nuclei-templates; then
+              echo \&quot;[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Templates actualizados OK\&quot; &gt;&gt; /root/nuclei-templates/update.log;
+              sleep 86400;
+            else
+              echo \&quot;[$(date -u +%Y-%m-%dT%H:%M:%SZ)] ERROR al actualizar templates, reintentando en 1h\&quot; &gt;&gt; /root/nuclei-templates/update.log;
+              sleep 3600;
+            fi
+          done&quot;
     <span class="c-yellow">volumes</span>:
       - <span class="c-green">nuclei-templates:/root/nuclei-templates</span>
     <span class="c-yellow">networks</span>:
       - <span class="c-green">secops-net</span>
-
-  <span class="c-muted"># ─── NUCLEI API WRAPPER ────────────────────────────────────</span>
-  <span class="c-cyan">nuclei-api</span>:
-    <span class="c-yellow">image</span>: <span class="c-green">projectdiscovery/nuclei:latest</span>
-    <span class="c-yellow">container_name</span>: <span class="c-green">nuclei-api</span>
-    <span class="c-yellow">restart</span>: <span class="c-green">unless-stopped</span>
+    <span class="c-yellow">healthcheck</span>:
+      <span class="c-yellow">test</span>:<span class="c-green"> [&quot;CMD-SHELL&quot;, &quot;test -f /root/nuclei-templates/update.log || exit 1&quot;]</span>
+      <span class="c-yellow">interval</span>:<span class="c-green"> 30s</span>
+      <span class="c-yellow">timeout</span>:<span class="c-green"> 10s</span>
+      <span class="c-yellow">retries</span>:<span class="c-green"> 10</span>
+      <span class="c-yellow">start_period</span>:<span class="c-green"> 120s</span>
+  <span class="c-muted">  # ─── NUCLEI API WRAPPER ───────────────────────────────────────</span>
+  <span class="c-yellow">nuclei-api</span>:
+    <span class="c-yellow">build</span>:
+      <span class="c-yellow">context</span>:<span class="c-green"> .</span>
+      <span class="c-yellow">dockerfile</span>:<span class="c-green"> Dockerfile.nuclei-api</span>
+    <span class="c-yellow">container_name</span>:<span class="c-green"> nuclei-api</span>
+    <span class="c-yellow">restart</span>:<span class="c-green"> unless-stopped</span>
     <span class="c-yellow">ports</span>:
       - <span class="c-green">&quot;5000:5000&quot;</span>
     <span class="c-yellow">environment</span>:
-      - <span class="c-green">DMZ_DVWA=\${DMZ_DVWA}</span>
-      - <span class="c-green">DMZ_JUICESHOP=\${DMZ_JUICESHOP}</span>
+      - <span class="c-green">DMZ_DVWA=${DMZ_DVWA}</span>
+      - <span class="c-green">DMZ_JUICESHOP=${DMZ_JUICESHOP}</span>
     <span class="c-yellow">volumes</span>:
       - <span class="c-green">nuclei-templates:/root/nuclei-templates</span>
       - <span class="c-green">nuclei-reports:/reports</span>
       - <span class="c-green">./nuclei-api.py:/app/nuclei-api.py</span>
-    <span class="c-yellow">working_dir</span>: <span class="c-green">/app</span>
-    <span class="c-yellow">entrypoint</span>: <span class="c-muted">&gt;</span>
-      <span class="c-green">sh -c &quot;apk add python3 py3-pip -q &amp;&amp;
-             pip install flask -q --break-system-packages &amp;&amp;
-             python3 nuclei-api.py&quot;</span>
+    <span class="c-yellow">working_dir</span>:<span class="c-green"> /app</span>
     <span class="c-yellow">networks</span>:
-      - <span class="c-green">secops-net</span> <span class="c-muted"># ← nuclei-api en secops-net</span>
+      - <span class="c-green">secops-net</span>
     <span class="c-yellow">depends_on</span>:
-      - <span class="c-green">nuclei-updater</span>
-
-  <span class="c-muted"># ─── N8N ───────────────────────────────────────────────────</span>
-  <span class="c-cyan">n8n</span>:
-    <span class="c-yellow">image</span>: <span class="c-green">n8nio/n8n:latest</span>
-    <span class="c-yellow">container_name</span>: <span class="c-green">n8n</span>
-    <span class="c-yellow">restart</span>: <span class="c-green">unless-stopped</span>
+      <span class="c-yellow">nuclei-updater</span>:
+        <span class="c-yellow">condition</span>:<span class="c-green"> service_healthy</span>
+  <span class="c-muted">  # ─── N8N ──────────────────────────────────────────────────────</span>
+  <span class="c-yellow">n8n</span>:
+    <span class="c-yellow">image</span>:<span class="c-green"> n8nio/n8n:latest</span>
+    <span class="c-yellow">container_name</span>:<span class="c-green"> n8n</span>
+    <span class="c-yellow">restart</span>:<span class="c-green"> unless-stopped</span>
     <span class="c-yellow">ports</span>:
       - <span class="c-green">&quot;5678:5678&quot;</span>
     <span class="c-yellow">environment</span>:
@@ -224,21 +246,22 @@ export default {
       - <span class="c-green">N8N_HOST=0.0.0.0</span>
       - <span class="c-green">N8N_PORT=5678</span>
       - <span class="c-green">N8N_PROTOCOL=http</span>
-      - <span class="c-green">WEBHOOK_URL=http://\${SECOPS_IP}:5678</span>
-      - <span class="c-green">N8N_BASIC_AUTH_ACTIVE=true</span>
-      - <span class="c-green">N8N_BASIC_AUTH_USER=\${N8N_USER}</span>
-      - <span class="c-green">N8N_BASIC_AUTH_PASSWORD=\${N8N_PASSWORD}</span>
+      - <span class="c-green">WEBHOOK_URL=http://${SECOPS_IP}:5678</span>
+      - <span class="c-green">N8N_BASIC_AUTH_ACTIVE=false</span>
+      - <span class="c-green">N8N_USER_MANAGEMENT_JWT_SECRET=${N8N_JWT_SECRET}</span>
+      - <span class="c-green">N8N_DEFAULT_USER_EMAIL=${N8N_USER}</span>
+      - <span class="c-green">N8N_DEFAULT_USER_PASSWORD=${N8N_PASSWORD}</span>
       - <span class="c-green">N8N_LOG_LEVEL=info</span>
       - <span class="c-green">N8N_COMMUNITY_PACKAGES_ENABLED=true</span>
       - <span class="c-green">N8N_SECURE_COOKIE=false</span>
       - <span class="c-green">N8N_ALLOW_EXEC=true</span>
       - <span class="c-green">GENERIC_TIMEZONE=Europe/Madrid</span>
       - <span class="c-green">TZ=Europe/Madrid</span>
-      - <span class="c-green">ZAP_API_KEY=\${ZAP_API_KEY}</span>
-      - <span class="c-green">OPENCLAW_TOKEN=\${OPENCLAW_TOKEN}</span>
-      - <span class="c-green">OPENCLAW_URL=http://host.docker.internal:\${OPENCLAW_PORT:-18789}</span>
-      - <span class="c-green">DMZ_DVWA=\${DMZ_DVWA}</span>
-      - <span class="c-green">DMZ_JUICESHOP=\${DMZ_JUICESHOP}</span>
+      - <span class="c-green">ZAP_API_KEY=${ZAP_API_KEY}</span>
+      - <span class="c-green">OPENCLAW_TOKEN=${OPENCLAW_TOKEN}</span>
+      - <span class="c-green">OPENCLAW_URL=http://host.docker.internal:${OPENCLAW_PORT:-18789}</span>
+      - <span class="c-green">DMZ_DVWA=${DMZ_DVWA}</span>
+      - <span class="c-green">DMZ_JUICESHOP=${DMZ_JUICESHOP}</span>
     <span class="c-yellow">volumes</span>:
       - <span class="c-green">n8n-data:/home/node/.n8n</span>
       - <span class="c-green">zap-reports:/zap-reports:ro</span>
@@ -246,25 +269,24 @@ export default {
     <span class="c-yellow">networks</span>:
       - <span class="c-green">secops-net</span>
     <span class="c-yellow">depends_on</span>:
-      - <span class="c-green">zap</span>
+      <span class="c-yellow">zap</span>:
+        <span class="c-yellow">condition</span>:<span class="c-green"> service_healthy</span>
     <span class="c-yellow">extra_hosts</span>:
       - <span class="c-green">&quot;host.docker.internal:host-gateway&quot;</span>
-
-<span class="c-muted"># ─── VOLÚMENES ─────────────────────────────────────────────</span>
+  <span class="c-muted"># ─── VOLÚMENES ────────────────────────────────────────────────</span>
 <span class="c-yellow">volumes</span>:
-  <span class="c-cyan">zap-data</span>:
-  <span class="c-cyan">zap-reports</span>:
-  <span class="c-cyan">nuclei-templates</span>:
-  <span class="c-cyan">nuclei-reports</span>:
-  <span class="c-cyan">n8n-data</span>:
-
-  <span class="c-muted"># ─── RED ───────────────────────────────────────────────────</span>
+  <span class="c-yellow">zap-data</span>:
+  <span class="c-yellow">zap-reports</span>:
+  <span class="c-yellow">nuclei-templates</span>:
+  <span class="c-yellow">nuclei-reports</span>:
+  <span class="c-yellow">n8n-data</span>:
+  <span class="c-muted"># ─── RED ──────────────────────────────────────────────────────</span>
 <span class="c-yellow">networks</span>:
-  <span class="c-cyan">secops-net</span>:
-    <span class="c-yellow">driver</span>: <span class="c-green">bridge</span>
+  <span class="c-yellow">secops-net</span>:
+    <span class="c-yellow">driver</span>:<span class="c-green"> bridge</span>
     <span class="c-yellow">ipam</span>:
       <span class="c-yellow">config</span>:
-        - <span class="c-yellow">subnet</span>: <span class="c-green">172.20.0.0/24</span></div>
+        - <span class="c-green">subnet: 172.20.0.0/24</span></div>
       </div>
 
       <h3>// .env (sin secretos)</h3>
@@ -285,19 +307,19 @@ export default {
           >Copiar</button>
         </div>
       </div>
-      <div class="code-body"><span class="c-muted"># IPs / Targets</span>
-<span class="c-cyan">SECOPS_IP</span>=<span class="c-green">203.0.114.10</span>
-<span class="c-cyan">DMZ_DVWA</span>=<span class="c-green">http://203.0.113.10:8080</span>
-<span class="c-cyan">DMZ_JUICESHOP</span>=<span class="c-green">http://203.0.113.10:3000</span>
+      <div class="code-body"><span class="c-muted"># IPs targets (DMZ)</span>
+<span class="c-cyan">DMZ_DVWA</span>=<span class="c-green">http://203.0.113.X:8080</span>
+<span class="c-cyan">DMZ_JUICESHOP</span>=<span class="c-green">http://203.0.113.X:3000</span>
 
-<span class="c-muted"># ZAP</span>
+<span class="c-muted"># SecOps</span>
+<span class="c-cyan">SECOPS_IP</span>=<span class="c-green">203.0.114.X</span>
+
+<span class="c-muted"># ZAP · n8n · Nuclei API · OpenClaw</span>
 <span class="c-cyan">ZAP_API_KEY</span>=<span class="c-green">__REDACTED__</span>
-
-<span class="c-muted"># n8n</span>
 <span class="c-cyan">N8N_USER</span>=<span class="c-green">admin</span>
 <span class="c-cyan">N8N_PASSWORD</span>=<span class="c-green">__REDACTED__</span>
-
-<span class="c-muted"># OpenClaw</span>
+<span class="c-cyan">N8N_JWT_SECRET</span>=<span class="c-green">__REDACTED__</span>
+<span class="c-cyan">NUCLEI_API_KEY</span>=<span class="c-green">__REDACTED__</span>
 <span class="c-cyan">OPENCLAW_TOKEN</span>=<span class="c-green">__REDACTED__</span>
 <span class="c-cyan">OPENCLAW_PORT</span>=<span class="c-green">18789</span></div>
     </div>
@@ -338,7 +360,7 @@ export default {
           <div class="step-num">03</div>
           <div class="install-body">
             <div class="step-title">Orden y red (secops-net)</div>
-            <div class="step-desc"><code>nuclei-api</code> usa <code>depends_on: nuclei-updater</code> para arrancar con un primer lote de templates listo. Todo el stack resuelve nombres en <code>secops-net</code> (<code>owasp-zap</code>, <code>n8n</code>, etc.) y solo expones al host lo imprescindible.</div>
+            <div class="step-desc"><code>nuclei-api</code> y <code>nuclei</code> esperan a <code>nuclei-updater</code> (<code>service_healthy</code>) antes de arrancar. Todo el stack resuelve nombres en <code>secops-net</code> (<code>owasp-zap</code>, <code>n8n</code>, etc.) y solo expones al host lo imprescindible.</div>
             <div class="cmd-list">
               <div class="cmd-row cmd-row-plain">
                 <code class="cmd">subnet 172.20.0.0/24 · puertos típicos hacia fuera: 5678, 8090, 5000</code>
@@ -365,7 +387,7 @@ export default {
           </div>
         </div>
         <div class="code-body"><span class="c-muted"># Flask wrapper para ejecutar Nuclei bajo demanda y devolver JSON</span>
-<span class="c-muted"># Endpoints:</span> <span class="c-cyan">POST</span> <span class="c-green">/scan</span> · <span class="c-cyan">GET</span> <span class="c-green">/health</span> · <span class="c-cyan">GET</span> <span class="c-green">/templates</span>
+<span class="c-muted"># Endpoints:</span> <span class="c-cyan">POST</span> <span class="c-green">/scan</span> · <span class="c-cyan">GET</span> <span class="c-green">/health</span> · <span class="c-cyan">GET</span> <span class="c-green">/templates</span> · <span class="c-cyan">GET</span> <span class="c-green">/reports</span> · header <span class="c-green">X-API-Key</span> si <span class="c-green">NUCLEI_API_KEY</span> está definida
 
 <span class="c-muted"># Idea:</span> n8n llama a <span class="c-green">http://nuclei-api:5000/scan</span> y recibe findings parseados.</div>
       </div>
@@ -376,8 +398,7 @@ export default {
 
       <!-- Fuentes copiables (robusto, sin romper HTML) -->
       <textarea id="secops-compose-yml" hidden>services:
-
-  # ─── OWASP ZAP ─────────────────────────────────────────────
+  # ─── OWASP ZAP ────────────────────────────────────────────────
   zap:
     image: ghcr.io/zaproxy/zaproxy:stable
     container_name: owasp-zap
@@ -385,7 +406,12 @@ export default {
     mem_limit: 4g
     mem_reservation: 1g
     command: >
-      zap.sh -daemon -host 0.0.0.0 -port 8090 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true -config api.key=\${ZAP_API_KEY} -config api.disablekey=false -config connection.timeoutInSecs=300
+      zap.sh -daemon -host 0.0.0.0 -port 8090
+      -config api.addrs.addr.name=.*
+      -config api.addrs.addr.regex=true
+      -config api.key=\${ZAP_API_KEY}
+      -config api.disablekey=false
+      -config connection.timeoutInSecs=300
     ports:
       - "8090:8090"
     environment:
@@ -399,17 +425,22 @@ export default {
     networks:
       - secops-net
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8090/JSON/core/view/version/ || exit 1" ]
+      test:
+        [
+          "CMD-SHELL",
+          "curl -f http://localhost:8090/JSON/core/view/version/ || exit 1",
+        ]
       interval: 20s
       timeout: 10s
       retries: 5
       start_period: 60s
-  # ─── NUCLEI ────────────────────────────────────────────────
+
+  # ─── NUCLEI (runner bajo demanda) ────────────────────────────
   nuclei:
     image: projectdiscovery/nuclei:latest
     container_name: nuclei
     restart: unless-stopped
-    entrypoint: [ "sleep", "infinity" ]
+    entrypoint: ["sleep", "infinity"]
     environment:
       - DMZ_DVWA=\${DMZ_DVWA}
       - DMZ_JUICESHOP=\${DMZ_JUICESHOP}
@@ -418,26 +449,44 @@ export default {
       - nuclei-reports:/reports
     networks:
       - secops-net
+    depends_on:
+      nuclei-updater:
+        condition: service_healthy
 
-  # ─── NUCLEI TEMPLATE UPDATER (cada 24h) ────────────────────
+  # ─── NUCLEI TEMPLATE UPDATER (cada 24h) ──────────────────────
+  # El bucle: intenta actualizar, espera 1h si falla, 24h si OK.
+  # restart: on-failure evita reinicios infinitos ante errores graves.
   nuclei-updater:
     image: projectdiscovery/nuclei:latest
     container_name: nuclei-updater
-    restart: unless-stopped
+    restart: on-failure
     entrypoint: >
-      sh -c "while true; do
-        nuclei -update-templates -ud /root/nuclei-templates &&
-        echo \"[updater] Templates OK\" >> /root/nuclei-templates/update.log 2>&1;
-        sleep 86400;
-      done"
+      sh -c "
+        while true; do
+          if nuclei -update-templates -ud /root/nuclei-templates; then
+            echo \"[$(date -u +%Y-%m-%dT%H:%M:%SZ)] Templates actualizados OK\" >> /root/nuclei-templates/update.log;
+            sleep 86400;
+          else
+            echo \"[$(date -u +%Y-%m-%dT%H:%M:%SZ)] ERROR al actualizar templates, reintentando en 1h\" >> /root/nuclei-templates/update.log;
+            sleep 3600;
+          fi
+        done"
     volumes:
       - nuclei-templates:/root/nuclei-templates
     networks:
       - secops-net
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /root/nuclei-templates/update.log || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
 
-  # ─── NUCLEI API WRAPPER ────────────────────────────────────
+  # ─── NUCLEI API WRAPPER ───────────────────────────────────────
   nuclei-api:
-    image: projectdiscovery/nuclei:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.nuclei-api
     container_name: nuclei-api
     restart: unless-stopped
     ports:
@@ -450,16 +499,13 @@ export default {
       - nuclei-reports:/reports
       - ./nuclei-api.py:/app/nuclei-api.py
     working_dir: /app
-    entrypoint: >
-      sh -c "apk add python3 py3-pip -q &&
-             pip install flask -q --break-system-packages &&
-             python3 nuclei-api.py"
     networks:
-      - secops-net # ← ESTO FALTABA: nuclei-api no estaba en la red
+      - secops-net
     depends_on:
-      - nuclei-updater
+      nuclei-updater:
+        condition: service_healthy
 
-  # ─── N8N ───────────────────────────────────────────────────
+  # ─── N8N ──────────────────────────────────────────────────────
   n8n:
     image: n8nio/n8n:latest
     container_name: n8n
@@ -472,9 +518,10 @@ export default {
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       - WEBHOOK_URL=http://\${SECOPS_IP}:5678
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=\${N8N_USER}
-      - N8N_BASIC_AUTH_PASSWORD=\${N8N_PASSWORD}
+      - N8N_BASIC_AUTH_ACTIVE=false
+      - N8N_USER_MANAGEMENT_JWT_SECRET=\${N8N_JWT_SECRET}
+      - N8N_DEFAULT_USER_EMAIL=\${N8N_USER}
+      - N8N_DEFAULT_USER_PASSWORD=\${N8N_PASSWORD}
       - N8N_LOG_LEVEL=info
       - N8N_COMMUNITY_PACKAGES_ENABLED=true
       - N8N_SECURE_COOKIE=false
@@ -493,11 +540,12 @@ export default {
     networks:
       - secops-net
     depends_on:
-      - zap
+      zap:
+        condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-# ─── VOLÚMENES ─────────────────────────────────────────────
+# ─── VOLÚMENES ────────────────────────────────────────────────
 volumes:
   zap-data:
   zap-reports:
@@ -505,43 +553,58 @@ volumes:
   nuclei-reports:
   n8n-data:
 
-    # ─── RED ───────────────────────────────────────────────────
+# ─── RED ──────────────────────────────────────────────────────
 networks:
   secops-net:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.0.0/24
-</textarea>
+        - subnet: 172.20.0.0/24</textarea>
 
-      <textarea id="secops-env" hidden># ─── IPs / Targets ─────────────────────────────────────────
-SECOPS_IP=203.0.114.10
+      <textarea id="secops-env" hidden># ─── IPs de los targets en la VLAN DMZ ───────────────────────
+DMZ_DVWA=http://203.0.113.X:8080
+DMZ_JUICESHOP=http://203.0.113.X:3000
 
-DMZ_IP=203.0.113.10
-DMZ_DVWA=http://203.0.113.10:8080
-DMZ_JUICESHOP=http://203.0.113.10:3000
+# ─── IP de esta VM (SecOps) ───────────────────────────────────
+SECOPS_IP=203.0.114.X
 
-# ─── ZAP ───────────────────────────────────────────────────
+# ─── ZAP ──────────────────────────────────────────────────────
 ZAP_API_KEY=__REDACTED__
 
-# ─── N8N ───────────────────────────────────────────────────
+# ─── n8n ──────────────────────────────────────────────────────
 N8N_USER=admin
 N8N_PASSWORD=__REDACTED__
+N8N_JWT_SECRET=__REDACTED__
 
-# ─── OpenClaw ──────────────────────────────────────────────
+# ─── Nuclei API ───────────────────────────────────────────────
+NUCLEI_API_KEY=__REDACTED__
+
+# ─── OpenClaw ─────────────────────────────────────────────────
 OPENCLAW_TOKEN=__REDACTED__
-OPENCLAW_PORT=18789
-</textarea>
+OPENCLAW_PORT=18789</textarea>
 
       <textarea id="secops-nuclei-api-py" hidden>from flask import Flask, request, jsonify
-import subprocess, os, json
+from urllib.parse import urlparse
+import subprocess, os, json, uuid, logging
 from datetime import datetime
+
+# ─── Logging ──────────────────────────────────────────────────
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s] [%(levelname)s] %(message)s',
+    datefmt='%Y-%m-%dT%H:%M:%S',
+)
+log = logging.getLogger('nuclei-api')
 
 app = Flask(__name__)
 
-# Carpetas de templates útiles para pentesting web
-# Nuclei v3: el flag es -jsonl, no -json
-# La estructura es /root/nuclei-templates/http/...
+# ─── Config desde entorno ──────────────────────────────────────
+API_KEY      = os.getenv('NUCLEI_API_KEY', '')          # vacío = sin auth (solo lab)
+REPORTS_DIR  = os.getenv('REPORTS_DIR', '/reports')
+BULK_SIZE    = os.getenv('NUCLEI_BULK_SIZE', '20')
+CONCURRENCY  = os.getenv('NUCLEI_CONCURRENCY', '10')
+SCAN_TIMEOUT = int(os.getenv('NUCLEI_SCAN_TIMEOUT', '300'))  # timeout proceso (seg)
+REQ_TIMEOUT  = os.getenv('NUCLEI_REQ_TIMEOUT', '10')         # timeout por request HTTP
 
 TEMPLATE_DIRS = [
     '/root/nuclei-templates/http/vulnerabilities/',
@@ -550,80 +613,149 @@ TEMPLATE_DIRS = [
     '/root/nuclei-templates/http/cves/',
 ]
 
+# ─── Helpers ──────────────────────────────────────────────────
+def require_key():
+    """Devuelve respuesta 401 si la API key no es válida. None si OK."""
+    if API_KEY and request.headers.get('X-API-Key') != API_KEY:
+        return jsonify({'error': 'unauthorized'}), 401
+    return None
+
+
+def is_valid_target(target: str) -> bool:
+    """Valida que el target sea una URL http/https bien formada."""
+    try:
+        parsed = urlparse(target)
+        return parsed.scheme in ('http', 'https') and bool(parsed.netloc)
+    except Exception:
+        return False
+
+
+def safe_filename(target: str) -> str:
+    """Genera un nombre de fichero seguro a partir del target."""
+    name = (
+        target
+        .replace('http://', '')
+        .replace('https://', '')
+        .replace('/', '-')
+        .replace(':', '-')
+    )
+    # Eliminar caracteres no seguros
+    name = ''.join(c for c in name if c.isalnum() or c in '-_.')
+    return name[:80]  # limitar longitud
+
+
+# ─── Endpoints ────────────────────────────────────────────────
 @app.route('/scan', methods=['POST'])
 def scan():
-    data = request.json
-    target = data.get('target', '')
+    err = require_key()
+    if err:
+        return err
+
+    data = request.json or {}
+    target   = data.get('target', '').strip()
     severity = data.get('severity', 'low,medium,high,critical')
+    # Permitir sobreescribir concurrencia/bulk desde el request (opcional)
+    bulk     = str(data.get('bulk_size', BULK_SIZE))
+    conc     = str(data.get('concurrency', CONCURRENCY))
 
     if not target:
-        return jsonify({'error': 'target required'}), 400
+        return jsonify({'error': 'target requerido'}), 400
 
-    date = datetime.now().strftime('%Y%m%d_%H%M')
-    name = target.replace('http://', '').replace('https://', '').replace('/', '-').replace(':', '-')
-    output = f"/reports/{name}-{date}.jsonl"
+    if not is_valid_target(target):
+        return jsonify({'error': 'target inválido — debe ser http:// o https://'}), 400
 
-    # Usar solo templates que existen
+    # Nombre de fichero con uuid corto para evitar colisiones
+    date   = datetime.now().strftime('%Y%m%d_%H%M%S')
+    name   = safe_filename(target)
+    run_id = uuid.uuid4().hex[:6]
+    output = os.path.join(REPORTS_DIR, f"{name}-{date}-{run_id}.jsonl")
+
+    # Templates disponibles
     template_args = []
     for tdir in TEMPLATE_DIRS:
         if os.path.isdir(tdir):
             template_args += ['-t', tdir]
 
-    # Si no hay ninguna carpeta válida, usar auto-detect de nuclei
     if not template_args:
+        log.warning("No se encontraron carpetas de templates, usando -automatic-scan")
         template_args = ['-automatic-scan']
 
     cmd = [
         'nuclei',
         *template_args,
-        '-u', target,
-        '-severity', severity,
-        '-jsonl',           # ← Nuclei v3 usa -jsonl, no -json
-        '-o', output,
-        '-timeout', '10',
-        '-retries', '1',
-        '-bulk-size', '20',
-        '-concurrency', '10',
-        '-no-interactsh',   # evitar dependencia externa
+        '-u',           target,
+        '-severity',    severity,
+        '-jsonl',
+        '-o',           output,
+        '-timeout',     REQ_TIMEOUT,
+        '-retries',     '1',
+        '-bulk-size',   bulk,
+        '-concurrency', conc,
+        '-no-interactsh',
     ]
 
-    print(f\"[nuclei-api] CMD: {' '.join(cmd)}\", flush=True)
+    log.info(f"Iniciando scan | target={target} | severity={severity} | output={output}")
+    log.info(f"CMD: {' '.join(cmd)}")
 
     try:
-        result = subprocess.run(cmd, timeout=300, capture_output=True, text=True)
-        print(f\"[nuclei-api] STDOUT: {result.stdout[:500]}\", flush=True)
-        print(f\"[nuclei-api] STDERR: {result.stderr[:500]}\", flush=True)
+        result = subprocess.run(
+            cmd,
+            timeout=SCAN_TIMEOUT,
+            capture_output=True,
+            text=True
+        )
+
+        if result.stdout:
+            log.info(f"STDOUT: {result.stdout[:500]}")
+        if result.stderr:
+            log.warning(f"STDERR: {result.stderr[:500]}")
 
         findings = []
         if os.path.exists(output):
             with open(output) as f:
                 for line in f:
                     line = line.strip()
-                    if line:
-                        try:
-                            findings.append(json.loads(line))
-                        except Exception as e:
-                            print(f\"[nuclei-api] parse error: {e} | line: {line[:100]}\", flush=True)
+                    if not line:
+                        continue
+                    try:
+                        findings.append(json.loads(line))
+                    except json.JSONDecodeError as e:
+                        log.error(f"Parse error en línea JSONL: {e} | '{line[:100]}'")
+
+        log.info(f"Scan finalizado | findings={len(findings)}")
 
         return jsonify({
-            'ok': True,
-            'findings': findings,
-            'count': len(findings),
-            'output_file': output,
-            'templates_used': template_args
+            'ok':             True,
+            'target':         target,
+            'findings':       findings,
+            'count':          len(findings),
+            'output_file':    output,
+            'templates_used': template_args,
+            'run_id':         run_id,
         })
 
     except subprocess.TimeoutExpired:
-        return jsonify({'error': 'nuclei timeout after 300s', 'ok': False}), 500
+        log.error(f"Timeout tras {SCAN_TIMEOUT}s | target={target}")
+        return jsonify({
+            'ok':    False,
+            'error': f'nuclei timeout after {SCAN_TIMEOUT}s',
+            'target': target,
+        }), 500
+
     except Exception as e:
-        return jsonify({'error': str(e), 'ok': False}), 500
+        log.exception(f"Error inesperado en scan: {e}")
+        return jsonify({'ok': False, 'error': str(e)}), 500
 
 
 @app.route('/health', methods=['GET'])
 def health():
-    # Devuelve también info de templates disponibles
     available = [d for d in TEMPLATE_DIRS if os.path.isdir(d)]
-    return jsonify({'ok': True, 'templates_available': available})
+    return jsonify({
+        'ok':                 True,
+        'templates_available': available,
+        'reports_dir':        REPORTS_DIR,
+        'auth_enabled':       bool(API_KEY),
+    })
 
 
 @app.route('/templates', methods=['GET'])
@@ -634,16 +766,35 @@ def list_templates():
             try:
                 count = sum(1 for f in os.listdir(tdir) if f.endswith('.yaml'))
                 result[tdir] = count
-            except:
+            except OSError as e:
+                log.error(f"No se pudo listar {tdir}: {e}")
                 result[tdir] = -1
         else:
             result[tdir] = 'NOT FOUND'
     return jsonify(result)
 
 
+@app.route('/reports', methods=['GET'])
+def list_reports():
+    """Lista los ficheros de reporte generados."""
+    err = require_key()
+    if err:
+        return err
+    try:
+        files = sorted(
+            [f for f in os.listdir(REPORTS_DIR) if f.endswith('.jsonl')],
+            reverse=True
+        )
+        return jsonify({'ok': True, 'reports': files, 'count': len(files)})
+    except OSError as e:
+        return jsonify({'ok': False, 'error': str(e)}), 500
+
+
+# ─── Arranque ─────────────────────────────────────────────────
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
-</textarea>
+    debug = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'
+    log.info(f"nuclei-api arrancando | debug={debug} | auth={'ON' if API_KEY else 'OFF'}")
+    app.run(host='0.0.0.0', port=5000, debug=debug)</textarea>
     </div>
   `,
 };
